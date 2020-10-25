@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:simpleType name="JComMessageType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="AwaitMove"/>
+            <xs:enumeration value="Move"/>
+            <xs:enumeration value="MoveInfo"/>
+            <xs:enumeration value="FinishTurn"/>
+            <xs:enumeration value="TurnInfo"/>
+            <xs:enumeration value="Login"/>
+            <xs:enumeration value="LoginReply"/>
+            <xs:enumeration value="AwaitSquad"/>
+            <xs:enumeration value="SubmitSquad"/>
+            <xs:enumeration value="SquadData"/>
+            <xs:enumeration value="Accept"/>
+            <xs:enumeration value="Win"/>
+            <xs:enumeration value="Disconnect"/>
+            <!-- Spectatores only -->
+            <xs:enumeration value="SpectatorInfo"/>
+            <xs:enumeration value="GameStatus"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:element name="JComMessage">
+        <xs:complexType>
+            <xs:attribute name="messageType" type="JComMessageType" use="required"/>
+            <xs:attribute name="id" type="xs:int" use="required"/>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

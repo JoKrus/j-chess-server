@@ -1,0 +1,6 @@
+R: red spawn
+B: blue spawn
+-: default tile
+P: control point
+C: full cover
+H: half cover
