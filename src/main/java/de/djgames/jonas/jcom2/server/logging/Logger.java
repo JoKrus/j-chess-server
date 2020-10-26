@@ -2,8 +2,6 @@ package de.djgames.jonas.jcom2.server.logging;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -17,42 +15,55 @@ public class Logger {
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
     private static final String CONSOLE_STRING_TEMPLATE = "[%s] - %s - %s";
 
-    private static void log(Object msg, LogLevel lvl) {
+    private static void log(Object msg, Throwable throwable, LogLevel lvl) {
         String message = String.format(CONSOLE_STRING_TEMPLATE, DATE_FORMAT.format(new Date()), StringUtils.center(lvl.toString(), LogLevel.maxNameLen), msg);
         if (lvl.getVal() < minLevel.getVal()) {
             return;
         }
         System.out.println(message);
-
+        if (throwable != null)
+            throwable.printStackTrace();
     }
 
 
     public static void debug(Object msg) {
-        log(msg, LogLevel.DEBUG);
+        log(msg, null, LogLevel.DEBUG);
+    }
+
+    public static void debug(Object msg, Throwable throwable) {
+        log(msg, throwable, LogLevel.DEBUG);
     }
 
     public static void info(Object msg) {
-        log(msg, LogLevel.INFO);
+        log(msg, null, LogLevel.INFO);
+    }
+
+    public static void info(Object msg, Throwable throwable) {
+        log(msg, throwable, LogLevel.INFO);
     }
 
     public static void warning(Object msg) {
-        log(msg, LogLevel.WARNING);
+        log(msg, null, LogLevel.WARNING);
+    }
+
+    public static void warning(Object msg, Throwable throwable) {
+        log(msg, throwable, LogLevel.WARNING);
     }
 
     public static void error(Object msg) {
-        log(msg, LogLevel.ERROR);
+        log(msg, null, LogLevel.ERROR);
+    }
+
+    public static void error(Object msg, Throwable throwable) {
+        log(msg, throwable, LogLevel.ERROR);
     }
 
     public static void fatal(Object msg) {
-        log(msg, LogLevel.FATAL);
+        log(msg, null, LogLevel.FATAL);
     }
 
-    public static void stackTrace(Throwable throwable) {
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        throwable.printStackTrace(pw);
-        log(throwable.getClass() + " " + sw.toString(), LogLevel.STACK);
-        pw.close();
+    public static void fatal(Object msg, Throwable throwable) {
+        log(msg, throwable, LogLevel.FATAL);
     }
 
     public enum LogLevel {

@@ -194,7 +194,7 @@
             <xs:element name="map" type="MapData"/>
             <xs:element name="squadRed" type="Squad"/>
             <xs:element name="squadBlue" type="Squad"/>
-            <xs:element name="playerID" type="xs:int"/>
+            <xs:element name="playerId" type="xs:int"/>
             <xs:element name="moveMessage" type="MoveMessage"/>
             <xs:element name="score" type="PointData"/>
         </xs:sequence>
