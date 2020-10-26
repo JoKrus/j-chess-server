@@ -99,7 +99,7 @@ public class GameServer {
                         }
                     }
                 } catch (ExecutionException e) {
-                    e.printStackTrace();
+                    Logger.error(e.getMessage(), e);
                 }
                 if (clientSocket != null) {
                     // Nur eine Verbindung pro IP erlauben (Ausnahme localhost)
@@ -180,7 +180,7 @@ public class GameServer {
         try {
             networkInterfaces = NetworkInterface.getNetworkInterfaces();
         } catch (SocketException e) {
-            e.printStackTrace();
+            Logger.error(e.getMessage(), e);
         }
         if (networkInterfaces == null) throw new RuntimeException("Could not get NetworkInterfaces");
 
