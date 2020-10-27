@@ -16,7 +16,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
-        <xsd.sources.dir>src/main/resources/xsd/jcomMessage.xsd</xsd.sources.dir>
+        <xsd.sources.dir>src/main/resources/xsd/jComMessage.xsd</xsd.sources.dir>
         <generated.classes.dir>${project.build.sourceDirectory}</generated.classes.dir>
         <generated.classes.package>${project.groupId}.generated</generated.classes.package>
         <main.class>de.djgames.jonas.jcom2.server.StartServer</main.class>
