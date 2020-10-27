@@ -25,7 +25,6 @@ public class Logger {
             throwable.printStackTrace();
     }
 
-
     public static void debug(Object msg) {
         log(msg, null, LogLevel.DEBUG);
     }
