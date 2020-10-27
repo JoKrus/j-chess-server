@@ -26,7 +26,7 @@ public class XmlInputStream extends UTFInputStream {
             try {
                 // muss getResourceAsStream() statt getResource() sein
                 // damit es auch in jars funktioniert
-                InputStream resourceAsStream = getClass().getResourceAsStream("/xsd/jcomMessage.xsd");
+                InputStream resourceAsStream = getClass().getResourceAsStream("/xsd/jComMessage.xsd");
                 // Der Inputstream resourceAsStream wird in die Datei temp.xsd
                 // geschrieben und dann dem Schema uebergeben
                 // XXX: Kein bessere Implementierung gefunden

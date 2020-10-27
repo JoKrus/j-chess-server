@@ -23,7 +23,7 @@ public class XmlOutputStream extends UTFOutputStream {
         // Anlegen der JAXB-Komponenten
         try {
             SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            Schema schema = sf.newSchema(getClass().getResource("/xsd/jcomMessage.xsd"));
+            Schema schema = sf.newSchema(getClass().getResource("/xsd/jComMessage.xsd"));
 
             JAXBContext jaxbContext = JAXBContext.newInstance(JComMessage.class);
             this.marshaller = jaxbContext.createMarshaller();
