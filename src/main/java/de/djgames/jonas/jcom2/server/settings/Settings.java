@@ -9,7 +9,6 @@ import java.io.InputStream;
 import java.util.Properties;
 
 public class Settings {
-
     public static final String S_PORT = "PORT";
     private static final int DEF_PORT = 5123;
 
