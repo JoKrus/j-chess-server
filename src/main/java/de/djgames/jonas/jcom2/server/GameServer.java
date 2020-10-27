@@ -113,6 +113,7 @@ public class GameServer {
                         // asynchron
                         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                         connectedClients.add(connection.login());
+                        Logger.info(connectedClients.size() + " Clienten connected");
                     } else {
                         Logger.info("Game.HostAlreadyConnected " + ip);
                     }

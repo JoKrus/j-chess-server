@@ -40,10 +40,7 @@ public class XmlInputStream extends UTFInputStream {
                 fileOutputStream.close();
                 Schema schema = schemaFactory.newSchema(tempFile);
                 unmarshaller.setSchema(schema);
-                unmarshaller.setEventHandler(validationEvent -> {
-                    System.out.println("ich bin ein eventhandler");
-                    return false;
-                });
+                unmarshaller.setEventHandler(validationEvent -> false);
                 tempFile.deleteOnExit();
             } catch (SAXException e) {
                 e.printStackTrace();
@@ -72,7 +69,6 @@ public class XmlInputStream extends UTFInputStream {
             String xml = this.readUTF8();
             result = XMLToJCom(xml);
             Logger.debug("XmlInputStream.received");
-            Logger.debug(xml);
         } catch (UnmarshalException e) {
             throw e;
         } catch (JAXBException e) {

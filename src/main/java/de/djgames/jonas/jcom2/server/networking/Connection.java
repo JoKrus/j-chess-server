@@ -61,16 +61,17 @@ public class Connection {
     public void sendMessage(JComMessage jComMessage, boolean withTimer) {
         // Timer starten, der beim lesen beendet wird
         // Ablauf Timer = Problem User
-        if (withTimer)
+        if (withTimer) {
             //   this.timeOutManager.startSendMessageTimeOut(this.id, this);
-            try {
-                jComMessage.setId(this.id.toString());
-                this.outToClient.write(jComMessage);
-            } catch (IOException e) {
-                Logger.info("Connection.playerExitedUnexpected");
-                // entfernen des Spielers
-                GameServer.getInstance().removeConnection(this);
-            }
+        }
+        try {
+            jComMessage.setId(this.id.toString());
+            this.outToClient.write(jComMessage);
+        } catch (IOException e) {
+            Logger.info("Connection.playerExitedUnexpected");
+            // entfernen des Spielers
+            GameServer.getInstance().removeConnection(this);
+        }
     }
 
     /**
