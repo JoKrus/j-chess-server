@@ -1,0 +1,51 @@
+on:
+  push:
+    branches:
+      - master
+
+name: Create Release
+
+jobs:
+  build:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Get Current Version from POM
+        id: getxml
+        uses: mavrosxristoforos/get-xml-info@1.0
+        with:
+          xml-file: 'pom.xml'
+          xpath: '/project/version'
+
+      - name: Setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.x
+          architecture: x64
+
+      - name: 'Get Previous tag'
+        id: previoustag
+        uses: "WyriHaximus/github-action-get-previous-tag@master"
+
+      - name: check if version newer
+        run: export VERSION_NEWER="$(python3 -c "from packaging.version import parse as parse_version; import sys; sys.stdout.write(str(parse_version('${{ steps.getxml.outputs.info }}') > parse_version('${{ steps.previoustag.outputs.tag }}')).lower())")"
+
+      - name: check if version newer
+        run: export VERSION_PRERELEASE="$(python3 -c "from packaging.version import parse as parse_version; import sys; sys.stdout.write(str(parse_version('${{ steps.getxml.outputs.info }}') < parse_version('1.0.0')).lower())")"
+
+      - name: Create Release
+        if: ${{ VERSION_NEWER }} == 'true'
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: v${{ steps.getxml.outputs.info }}
+          release_name: Release ${{ steps.getxml.outputs.info }}
+          body: |
+            This Release is made automatically.
+            Some things have changed and a new version was set in the pom, so obviously a new release had to be done.
+          draft: false
+          prerelease: ${{ VERSION_PRERELEASE }}
