@@ -32,7 +32,7 @@ jobs:
       - name: check if version newer
         run: export VERSION_NEWER="$(python3 -c "from packaging.version import parse as parse_version; import sys; sys.stdout.write(str(parse_version('${{ steps.getxml.outputs.info }}') > parse_version('${{ steps.previoustag.outputs.tag }}')).lower())")"
 
-      - name: check if version newer
+      - name: check if version is prerelease
         run: export VERSION_PRERELEASE="$(python3 -c "from packaging.version import parse as parse_version; import sys; sys.stdout.write(str(parse_version('${{ steps.getxml.outputs.info }}') < parse_version('1.0.0')).lower())")"
 
       - name: Create Release
