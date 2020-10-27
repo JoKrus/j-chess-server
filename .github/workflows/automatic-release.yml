@@ -30,13 +30,13 @@ jobs:
         uses: "WyriHaximus/github-action-get-previous-tag@master"
 
       - name: check if version newer
-        run: export VERSION_NEWER="$(python3 -c "from packaging.version import parse as parse_version; import sys; sys.stdout.write(str(parse_version('${{ steps.getxml.outputs.info }}') > parse_version('${{ steps.previoustag.outputs.tag }}')).lower())")"
-
-      - name: check if version is prerelease
-        run: export VERSION_PRERELEASE="$(python3 -c "from packaging.version import parse as parse_version; import sys; sys.stdout.write(str(parse_version('${{ steps.getxml.outputs.info }}') < parse_version('1.0.0')).lower())")"
+        id: version_stuff
+        run: |
+          echo ::set-output name=VERSION_NEWER::$(python3 -c "from packaging.version import parse as parse_version; import sys; sys.stdout.write(str(parse_version('${{ steps.getxml.outputs.info }}') > parse_version('${{ steps.previoustag.outputs.tag }}')).lower())")
+          echo ::set-output name=VERSION_PRERELEASE::$(python3 -c "from packaging.version import parse as parse_version; import sys; sys.stdout.write(str(parse_version('${{ steps.getxml.outputs.info }}') < parse_version('1.0.0')).lower())")
 
       - name: Create Release
-        if: ${{ VERSION_NEWER }} == 'true'
+        if: steps.version_stuff.outputs.VERSION_NEWER == 'true'
         id: create_release
         uses: actions/create-release@v1
         env:
@@ -48,4 +48,4 @@ jobs:
             This Release is made automatically.
             Some things have changed and a new version was set in the pom, so obviously a new release had to be done.
           draft: false
-          prerelease: ${{ VERSION_PRERELEASE }}
+          prerelease: steps.version_stuff.outputs.VERSION_PRERELEASE
