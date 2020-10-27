@@ -48,4 +48,4 @@ jobs:
             This Release is made automatically.
             Some things have changed and a new version was set in the pom, so obviously a new release had to be done.
           draft: false
-          prerelease: steps.version_stuff.outputs.VERSION_PRERELEASE
+          prerelease: ${{ steps.version_stuff.outputs.VERSION_PRERELEASE }}
