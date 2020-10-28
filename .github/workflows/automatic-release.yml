@@ -12,12 +12,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Get Current Version from POM
-        id: getxml
-        uses: mavrosxristoforos/get-xml-info@1.0
-        with:
-          xml-file: 'pom.xml'
-          xpath: '/project/version'
 
       - name: Setup python
         uses: actions/setup-python@v2
@@ -32,18 +26,20 @@ jobs:
       - name: check if version newer
         id: version_stuff
         run: |
-          echo ::set-output name=VERSION_NEWER::$(python3 -c "from packaging.version import parse as parse_version; import sys; sys.stdout.write(str(parse_version('${{ steps.getxml.outputs.info }}') > parse_version('${{ steps.previoustag.outputs.tag }}')).lower())")
-          echo ::set-output name=VERSION_PRERELEASE::$(python3 -c "from packaging.version import parse as parse_version; import sys; sys.stdout.write(str(parse_version('${{ steps.getxml.outputs.info }}') < parse_version('1.0.0')).lower())")
+          export CUR_VERSION=$(mvn org.apache.maven.plugins:maven-help-plugin:3.1.0:evaluate -Dexpression=project.version -q -DforceStdout 2>/dev/null)
+          echo ::set-output name=VERSION_NEWER::$(python3 -c "from packaging.version import parse as parse_version; import sys; sys.stdout.write(str(parse_version('$CUR_VERSION') > parse_version('${{ steps.previoustag.outputs.tag }}')).lower())")
+          echo ::set-output name=VERSION_PRERELEASE::$(python3 -c "from packaging.version import parse as parse_version; import sys; sys.stdout.write(str(parse_version('$CUR_VERSION') < parse_version('1.0.0')).lower())")
+          echo ::set-output name=VERSION_CURRENT::$CUR_VERSION
 
       - name: Create Release
-        if: steps.version_stuff.outputs.VERSION_NEWER == 'true'
+        if: ${{ steps.version_stuff.outputs.VERSION_NEWER }} == 'true'
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
         with:
-          tag_name: v${{ steps.getxml.outputs.info }}
-          release_name: Release ${{ steps.getxml.outputs.info }}
+          tag_name: v${{ steps.version_stuff.outputs.VERSION_CURRENT }}
+          release_name: Release ${{ steps.version_stuff.outputs.VERSION_CURRENT }}
           body: |
             This Release is made automatically.
             Some things have changed and a new version was set in the pom, so obviously a new release had to be done.
