@@ -28,6 +28,7 @@ jobs:
         id: version_stuff
         run: |
           export CUR_VERSION=$(mvn org.apache.maven.plugins:maven-help-plugin:3.1.0:evaluate -Dexpression=project.version -q -DforceStdout 2>/dev/null)
+          python3 -m pip install --user packaging
           echo ::set-output name=VERSION_NEWER::$(python3 -c "from packaging.version import parse as parse_version; import sys; sys.stdout.write(str(parse_version('$CUR_VERSION') > parse_version('${{ steps.previoustag.outputs.tag }}')).lower())")
           echo ::set-output name=VERSION_PRERELEASE::$(python3 -c "from packaging.version import parse as parse_version; import sys; sys.stdout.write(str(parse_version('$CUR_VERSION') < parse_version('1.0.0')).lower())")
           echo ::set-output name=VERSION_CURRENT::$CUR_VERSION
