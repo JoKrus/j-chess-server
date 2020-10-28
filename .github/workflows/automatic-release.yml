@@ -12,13 +12,15 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - run: git fetch --prune --unshallow
+        with:
+          fetch-depth: 0
 
       - name: Setup python
         uses: actions/setup-python@v2
         with:
           python-version: 3.x
           architecture: x64
+      - run: python3 -m pip install --user packaging
 
       - name: 'Get Previous tag'
         id: previoustag
@@ -28,13 +30,18 @@ jobs:
         id: version_stuff
         run: |
           export CUR_VERSION=$(mvn org.apache.maven.plugins:maven-help-plugin:3.1.0:evaluate -Dexpression=project.version -q -DforceStdout 2>/dev/null)
-          python3 -m pip install --user packaging
-          echo ::set-output name=VERSION_NEWER::$(python3 -c "from packaging.version import parse as parse_version; import sys; sys.stdout.write(str(parse_version('$CUR_VERSION') > parse_version('${{ steps.previoustag.outputs.tag }}')).lower())")
-          echo ::set-output name=VERSION_PRERELEASE::$(python3 -c "from packaging.version import parse as parse_version; import sys; sys.stdout.write(str(parse_version('$CUR_VERSION') < parse_version('1.0.0')).lower())")
+          export VERSION_NEWER=$(python3 -c "from packaging.version import parse as parse_version; import sys; sys.stdout.write(str(parse_version('$CUR_VERSION') > parse_version('${{ steps.previoustag.outputs.tag }}')).lower())")
+          export VERSION_PRERELEASE=$(python3 -c "from packaging.version import parse as parse_version; import sys; sys.stdout.write(str(parse_version('$CUR_VERSION') < parse_version('1.0.0')).lower())")
+          echo "Last version: ${{ steps.previoustag.outputs.tag }}"
+          echo "Current version: $CUR_VERSION"
+          echo "Version is newer: $VERSION_NEWER"
+          echo "Version is prerelease: $VERSION_PRERELEASE"
+          echo ::set-output name=VERSION_NEWER::$VERSION_NEWER
+          echo ::set-output name=VERSION_PRERELEASE::$VERSION_PRERELEASE
           echo ::set-output name=VERSION_CURRENT::$CUR_VERSION
 
       - name: Create Release
-        if: ${{ steps.version_stuff.outputs.VERSION_NEWER }} == 'true'
+        if: steps.version_stuff.outputs.VERSION_NEWER == 'true'
         id: create_release
         uses: actions/create-release@v1
         env:
