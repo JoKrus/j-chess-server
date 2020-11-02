@@ -30,8 +30,9 @@ jobs:
         id: version_stuff
         run: |
           export CUR_VERSION=$(mvn org.apache.maven.plugins:maven-help-plugin:3.1.0:evaluate -Dexpression=project.version -q -DforceStdout 2>/dev/null)
-          export VERSION_NEWER=$(python3 -c "from packaging.version import parse as parse_version; import sys; sys.stdout.write(str(parse_version('$CUR_VERSION') > parse_version('${{ steps.previoustag.outputs.tag }}')).lower())")
-          export VERSION_PRERELEASE=$(python3 -c "from packaging.version import parse as parse_version; import sys; sys.stdout.write(str(parse_version('$CUR_VERSION') < parse_version('1.0.0')).lower())")
+          export CUR_VERSION=$(python3 -c "from datetime import datetime; print(str('$CUR_VERSION').replace('SNAPSHOT', datetime.now().strftime('%Y%m%d-%H%M%S')))")
+          export VERSION_NEWER=$(python3 -c "from packaging.version import parse as parse_version; import sys; sys.stdout.write(str(parse_version(str('$CUR_VERSION').lstrip('v')) > parse_version(str('${{ steps.previoustag.outputs.tag }}').lstrip('v'))).lower())")
+          export VERSION_PRERELEASE=$(python3 -c "from packaging.version import parse as parse_version; import sys; sys.stdout.write(str(parse_version(str('$CUR_VERSION').lstrip('v')) < parse_version('1.0.0')).lower())")
           echo "Last version: ${{ steps.previoustag.outputs.tag }}"
           echo "Current version: $CUR_VERSION"
           echo "Version is newer: $VERSION_NEWER"
