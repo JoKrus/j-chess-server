@@ -26,12 +26,28 @@ public class JComMessageFactory {
         return msg;
     }
 
+    public static JComMessage createHeartbeatMessage(UUID id) {
+        var msg = createBaseMessage(id, JComMessageType.HEART_BEAT);
+        var hbMsg = new HeartBeatMessage();
+        msg.setHeartBeat(hbMsg);
+        return msg;
+    }
+
     public static JComMessage createAcceptMessage(UUID playerID, ErrorType errorType) {
         var msg = createBaseMessage(playerID, JComMessageType.ACCEPT);
         var acceptMsg = new AcceptMessage();
         acceptMsg.setErrorTypeCode(errorType);
         acceptMsg.setAccept(errorType == ErrorType.NO_ERROR);
         msg.setAccept(acceptMsg);
+        return msg;
+    }
+
+    public static JComMessage createDisconnectMessage(UUID playerID, String name, ErrorType errorType) {
+        var msg = createBaseMessage(playerID, JComMessageType.DISCONNECT);
+        var disconnectMsg = new DisconnectMessage();
+        disconnectMsg.setErrorTypeCode(errorType);
+        disconnectMsg.setName(name);
+        msg.setDisconnect(disconnectMsg);
         return msg;
     }
 

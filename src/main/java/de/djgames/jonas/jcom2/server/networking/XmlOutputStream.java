@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringWriter;
 
-public class XmlOutputStream extends UTFOutputStream {
+public class XmlOutputStream extends StringOutputStream {
 
     private Marshaller marshaller;
 
@@ -24,46 +24,30 @@ public class XmlOutputStream extends UTFOutputStream {
         try {
             SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
             Schema schema = sf.newSchema(getClass().getResource("/xsd/jComMessage.xsd"));
-
             JAXBContext jaxbContext = JAXBContext.newInstance(JComMessage.class);
             this.marshaller = jaxbContext.createMarshaller();
             this.marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             marshaller.setSchema(schema);
             marshaller.setEventHandler(event -> true);
-        } catch (JAXBException jaxbException) {
-            Logger.debug("XmlOutputStream.ErrorInitialisingJAXBComponent");
-        } catch (SAXException e) {
-            e.printStackTrace();
+        } catch (JAXBException | SAXException e) {
+            Logger.error("XmlOutputStream.ErrorInitialisingJAXBComponent", e);
         }
     }
 
-    /**
-     * Versenden einer XML Nachricht
-     *
-     * @param jComMessage Message to write
-     */
     public void write(JComMessage jComMessage) throws IOException {
         // Generierung des fertigen XML
         try {
             // Versenden des XML
-            this.writeUTF8(jComToXML(jComMessage));
+            this.writeString(jComToXML(jComMessage));
             this.flush();
         } catch (JAXBException e) {
-            Logger.info("XmlOutputStream.errorSendingMessage", e);
+            Logger.error("XmlOutputStream.errorSendingMessage", e);
         }
     }
 
-    /**
-     * Stellt ein JCom-Objekt als XML dar
-     *
-     * @param jComMessage darzustellendes JCom-Objekt
-     * @return XML-Darstellung als String
-     * @throws JAXBException e
-     */
     public String jComToXML(JComMessage jComMessage) throws JAXBException {
         StringWriter stringWriter = new StringWriter();
         this.marshaller.marshal(jComMessage, stringWriter);
         return stringWriter.toString();
     }
-
 }

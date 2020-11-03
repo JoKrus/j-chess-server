@@ -1,9 +1,11 @@
 package de.djgames.jonas.jcom2.server;
 
+import de.djgames.jonas.jcom2.server.exceptions.RemoveClientException;
 import de.djgames.jonas.jcom2.server.logging.Logger;
 import de.djgames.jonas.jcom2.server.networking.Client;
 import de.djgames.jonas.jcom2.server.networking.Connection;
-import de.djgames.jonas.jcom2.server.networking.TCPConnectionCreationTask;
+import de.djgames.jonas.jcom2.server.networking.ConnectionAccepter;
+import de.djgames.jonas.jcom2.server.networking.JComMessageFactory;
 import de.djgames.jonas.jcom2.server.settings.Settings;
 
 import java.io.IOException;
@@ -36,6 +38,39 @@ public class GameServer {
         }
         connectedClients = new ArrayList<>();
         connectedIPs = new ArrayList<>();
+
+        ScheduledThreadPoolExecutor heartBeatSender = new ScheduledThreadPoolExecutor(1);
+        heartBeatSender.scheduleAtFixedRate(() -> {
+            List<Future<Client>> needsRemoval = new ArrayList<>();
+            for (var clientFuture : connectedClients) {
+                Client client = null;
+                try {
+                    client = clientFuture.get();
+                } catch (InterruptedException | ExecutionException e) {
+                    needsRemoval.add(clientFuture);
+                }
+
+                try {
+                    client.getConnection().sendMessage(JComMessageFactory.createHeartbeatMessage(client.getId()));
+                } catch (RemoveClientException e) {
+                    needsRemoval.add(clientFuture);
+                }
+            }
+            for (var fC : needsRemoval) {
+                Client client = null;
+                try {
+                    client = fC.get();
+                } catch (InterruptedException | ExecutionException e) {
+                }
+                if (client == null) {
+                    removeConnection(null);
+                    break;
+                }
+                removeConnection(client.getConnection());
+            }
+            Logger.info("Removed " + needsRemoval.size() + " connections.");
+        }, 0, 25, TimeUnit.SECONDS);
+
     }
 
     public static GameServer getInstance() {
@@ -56,9 +91,9 @@ public class GameServer {
         }
         connectedIPs = new ArrayList<>();
 
-        final CyclicBarrier barrier = new CyclicBarrier(2);
+        final CyclicBarrier synchronousBarrier = new CyclicBarrier(2);
         Socket clientSocket = null;
-        TCPConnectionCreationTask waitForConnectionTask = new TCPConnectionCreationTask(serverSocket, barrier);
+        ConnectionAccepter waitForConnectionTask = new ConnectionAccepter(serverSocket, synchronousBarrier);
         ExecutorService pool = Executors.newFixedThreadPool(1);
         Future<Socket> noSSLSocketFuture = null;
 
@@ -69,13 +104,13 @@ public class GameServer {
                 clientSocket = null;
                 Logger.info("Game.waitingForConnections");
                 // Neustart des benutzten serverSockets
-                //barrier.reset(); rausnehmen wegen Exception?
+                //synchronousBarrier.reset(); rausnehmen wegen Exception?
                 if (noSSLSocketFuture == null || noSSLSocketFuture.isDone()) {
                     noSSLSocketFuture = pool.submit(waitForConnectionTask);
                 }
 
                 // Warten bis Verbindung kommt
-                barrier.await();
+                synchronousBarrier.await();
                 cleanUpConnections();
 
                 //TODO Zeug machen mit timeout
@@ -89,7 +124,7 @@ public class GameServer {
 //                }
                 try {
                     // Fuer megaeklige Racekondition
-                    // Falls TCPConnectionCreationTask.call:barrier.await() langsamer ist als hier nach der Barrier von oben
+                    // Falls TCPConnectionCreationTask.call:synchronousBarrier.await() langsamer ist als hier nach der Barrier von oben
                     boolean fuckRaceConditions = true;
                     while (fuckRaceConditions) {
                         // Abrufen des Sockets für die neue Verbindung
@@ -118,11 +153,11 @@ public class GameServer {
                         Logger.info("Game.HostAlreadyConnected " + ip);
                     }
                 } else
-                    System.out.println("jClientSocket==null");
+                    Logger.info("jClientSocket==null");
             } catch (InterruptedException e) {
                 Logger.info("Game.playerWaitingTimedOut");
             } catch (BrokenBarrierException e) {
-                e.printStackTrace();
+                Logger.error(e.getMessage(), e);
             }
         }
     }
@@ -132,6 +167,7 @@ public class GameServer {
     }
 
     public void cleanUpConnections() {
+        //removes all clients with a null connection
         this.removeConnection(null);
     }
 
@@ -144,7 +180,7 @@ public class GameServer {
                     .filter(Future::isDone)
                     .filter((client) -> {
                         try {
-                            return (client.get().getId() == DEFAULT_UUID) || (client.get().getConnectionToClient().equals(toRemove));
+                            return (client.get().getId() == DEFAULT_UUID) || (client.get().getConnection().equals(toRemove));
                         } catch (InterruptedException | ExecutionException e) {
                             //remove interupted Logins to
                             return true;
@@ -158,7 +194,7 @@ public class GameServer {
                     if (clientToBeRemoved.isDone()) {
                         Client client = clientToBeRemoved.get();
                         if (client != null) {
-                            connectedIPs.remove(client.getConnectionToClient().getIpAddress().getHostAddress());
+                            connectedIPs.remove(client.getConnection().getIpAddress().getHostAddress());
                             //TODO remove von Game objekt
                         }
                     }

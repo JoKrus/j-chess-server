@@ -9,13 +9,13 @@ import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CyclicBarrier;
 
-public class TCPConnectionCreationTask implements Callable<Socket> {
+public class ConnectionAccepter implements Callable<Socket> {
     private final ServerSocket serverSocket;
-    private final CyclicBarrier barrier;
+    private final CyclicBarrier synchronousBarrier;
 
-    public TCPConnectionCreationTask(ServerSocket serverSocket, CyclicBarrier barrier) {
+    public ConnectionAccepter(ServerSocket serverSocket, CyclicBarrier synchronousBarrier) {
         this.serverSocket = serverSocket;
-        this.barrier = barrier;
+        this.synchronousBarrier = synchronousBarrier;
     }
 
     @Override
@@ -27,7 +27,7 @@ public class TCPConnectionCreationTask implements Callable<Socket> {
             Logger.error("Game.errorWhileConnecting" + " (Port:" + serverSocket.getLocalPort() + ")", e);
         }
         try {
-            barrier.await();
+            synchronousBarrier.await();
         } catch (InterruptedException | BrokenBarrierException e) {
             Logger.error("", e);
         }

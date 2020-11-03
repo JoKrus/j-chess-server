@@ -2,22 +2,11 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
     <xs:simpleType name="JComMessageType">
         <xs:restriction base="xs:string">
-            <xs:enumeration value="AwaitMove"/>
-            <xs:enumeration value="Move"/>
-            <xs:enumeration value="MoveInfo"/>
-            <xs:enumeration value="FinishTurn"/>
-            <xs:enumeration value="TurnInfo"/>
+            <xs:enumeration value="HeartBeat"/>
             <xs:enumeration value="Login"/>
             <xs:enumeration value="LoginReply"/>
-            <xs:enumeration value="AwaitSquad"/>
-            <xs:enumeration value="SubmitSquad"/>
-            <xs:enumeration value="SquadData"/>
             <xs:enumeration value="Accept"/>
-            <xs:enumeration value="Win"/>
             <xs:enumeration value="Disconnect"/>
-            <!-- Spectatores only -->
-            <xs:enumeration value="SpectatorInfo"/>
-            <xs:enumeration value="GameStatus"/>
         </xs:restriction>
     </xs:simpleType>
 
@@ -41,11 +30,18 @@
                 <xs:element name="Accept" type="AcceptMessage"/>
                 <xs:element name="Login" type="LoginMessage"/>
                 <xs:element name="LoginReply" type="LoginReplyMessage"/>
+                <xs:element name="HeartBeat" type="HeartBeatMessage"/>
+                <xs:element name="Disconnect" type="DisconnectMessage"/>
             </xs:choice>
             <xs:attribute name="messageType" type="JComMessageType" use="required"/>
             <xs:attribute name="id" type="UUID" use="required"/>
         </xs:complexType>
     </xs:element>
+
+    <xs:complexType name="HeartBeatMessage">
+        <xs:sequence>
+        </xs:sequence>
+    </xs:complexType>
 
     <xs:complexType name="LoginMessage">
         <xs:sequence>
@@ -62,6 +58,13 @@
     <xs:complexType name="AcceptMessage">
         <xs:sequence>
             <xs:element name="accept" type="xs:boolean"/>
+            <xs:element name="errorTypeCode" type="ErrorType"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="DisconnectMessage">
+        <xs:sequence>
+            <xs:element name="name" type="xs:string"/>
             <xs:element name="errorTypeCode" type="ErrorType"/>
         </xs:sequence>
     </xs:complexType>

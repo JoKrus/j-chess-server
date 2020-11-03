@@ -2,6 +2,7 @@ package de.djgames.jonas.jcom2.server.networking;
 
 import de.djgames.jonas.jcom2.server.generated.JComMessage;
 import de.djgames.jonas.jcom2.server.logging.Logger;
+import org.apache.commons.io.FileUtils;
 import org.xml.sax.SAXException;
 
 import javax.xml.XMLConstants;
@@ -11,9 +12,12 @@ import javax.xml.bind.UnmarshalException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
 
-public class XmlInputStream extends UTFInputStream {
+public class XmlInputStream extends StringInputStream {
 
     private Unmarshaller unmarshaller;
 
@@ -24,32 +28,21 @@ public class XmlInputStream extends UTFInputStream {
             unmarshaller = jaxbContext.createUnmarshaller();
             SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
             try {
-                // muss getResourceAsStream() statt getResource() sein
-                // damit es auch in jars funktioniert
                 InputStream resourceAsStream = getClass().getResourceAsStream("/xsd/jComMessage.xsd");
-                // Der Inputstream resourceAsStream wird in die Datei temp.xsd
-                // geschrieben und dann dem Schema uebergeben
-                // XXX: Kein bessere Implementierung gefunden
+                byte[] xsdFile = resourceAsStream.readAllBytes();
                 File tempFile = File.createTempFile("temp", ".xsd");
-                FileOutputStream fileOutputStream = new FileOutputStream(tempFile);
-                int read;
-                byte[] bytes = new byte[1024];
-                while ((read = resourceAsStream.read(bytes)) != -1) {
-                    fileOutputStream.write(bytes, 0, read);
-                }
-                fileOutputStream.close();
+                FileUtils.writeByteArrayToFile(tempFile, xsdFile);
                 Schema schema = schemaFactory.newSchema(tempFile);
                 unmarshaller.setSchema(schema);
                 unmarshaller.setEventHandler(validationEvent -> false);
                 tempFile.deleteOnExit();
             } catch (SAXException e) {
-                e.printStackTrace();
-                Logger.fatal("aah");
+                Logger.fatal(e.getLocalizedMessage(), e);
             } catch (IOException e) {
-                e.printStackTrace();
+                Logger.error(e.getLocalizedMessage(), e);
             }
         } catch (JAXBException e) {
-            Logger.fatal("aahbee");
+            Logger.fatal(e.getLocalizedMessage(), e);
         }
     }
 
@@ -57,25 +50,17 @@ public class XmlInputStream extends UTFInputStream {
         this(System.in);
     }
 
-    /**
-     * Liest eine Nachricht und gibt die entsprechende Instanz zurueck
-     *
-     * @return JcomMessage
-     * @throws IOException e
-     */
     public JComMessage readJCom() throws IOException, UnmarshalException {
         JComMessage result = null;
         try {
-            String xml = this.readUTF8();
+            Logger.debug("XML Input - Message receiving");
+            String xml = this.readMessage();
             result = XMLToJCom(xml);
-            Logger.debug("XmlInputStream.received");
+            Logger.debug("XML Input - Message received");
         } catch (UnmarshalException e) {
             throw e;
-        } catch (JAXBException e) {
-            e.printStackTrace();
-            Logger.error("XmlInputStream.errorUnmarshalling");
-        } catch (NullPointerException e) {
-            Logger.error("XmlInputStream.nullpointerWhileReading");
+        } catch (JAXBException | NullPointerException e) {
+            Logger.error(e.getLocalizedMessage(), e);
         }
         return result;
     }

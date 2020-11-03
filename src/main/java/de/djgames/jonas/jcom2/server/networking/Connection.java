@@ -1,6 +1,7 @@
 package de.djgames.jonas.jcom2.server.networking;
 
 import de.djgames.jonas.jcom2.server.GameServer;
+import de.djgames.jonas.jcom2.server.exceptions.RemoveClientException;
 import de.djgames.jonas.jcom2.server.generated.ErrorType;
 import de.djgames.jonas.jcom2.server.generated.JComMessage;
 import de.djgames.jonas.jcom2.server.logging.Logger;
@@ -9,6 +10,7 @@ import javax.xml.bind.UnmarshalException;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
@@ -17,27 +19,26 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class Connection {
-    private final ExecutorService executor;
-    private final Socket socket;
+    private final static ExecutorService loginQueueHandler = Executors.newFixedThreadPool(4);
+
+    public final Socket socket;
     private Future<Client> clientFuture;
-    private XmlInputStream inFromClient;
-    private XmlOutputStream outToClient;
+    private XmlInputStream fromClient;
+    private XmlOutputStream toClient;
     private UUID id;
 
     public Connection(Socket socket) {
         this.socket = socket;
         try {
-            this.inFromClient = new XmlInputStream(this.socket.getInputStream());
+            this.fromClient = new XmlInputStream(this.socket.getInputStream());
         } catch (IOException e) {
-            Logger.error("Connection.couldNotOpenInputStream");
+            Logger.error("Could not open InputStream", e);
         }
         try {
-            this.outToClient = new XmlOutputStream(this.socket.getOutputStream());
+            this.toClient = new XmlOutputStream(this.socket.getOutputStream());
         } catch (IOException e) {
-            Logger.error("Connection.couldNotOpenOutputStream");
+            Logger.error("Could not open Output Stream", e);
         }
-
-        this.executor = Executors.newFixedThreadPool(4);
     }
 
     public Client getClient() throws ExecutionException, InterruptedException {
@@ -45,8 +46,6 @@ public class Connection {
         return clientFuture.get();
     }
 
-    // TODO Muss nach Login unbedingt gesetzt werden!!!!!!!
-    // SEHR UNSCHOEN!!!!
     public void setId(UUID id) {
         this.id = id;
     }
@@ -55,76 +54,52 @@ public class Connection {
         return socket.getInetAddress();
     }
 
-    /**
-     * Allgemeines Senden einer fertigen JComMessage-Instanz
-     */
     public void sendMessage(JComMessage jComMessage, boolean withTimer) {
-        // Timer starten, der beim lesen beendet wird
-        // Ablauf Timer = Problem User
         if (withTimer) {
             //   this.timeOutManager.startSendMessageTimeOut(this.id, this);
         }
         try {
             jComMessage.setId(this.id.toString());
-            this.outToClient.write(jComMessage);
-        } catch (IOException e) {
-            Logger.info("Connection.playerExitedUnexpected");
-            // entfernen des Spielers
+            this.toClient.write(jComMessage);
+        } catch (SocketException e) {
+            Logger.info("Connection was closed unexpected", e);
+            GameServer.getInstance().removeConnection(this);
+            throw new RemoveClientException(e.getMessage(), e);
+        } catch (IOException e2) {
+            Logger.info("Connection was closed unexpected", e2);
             GameServer.getInstance().removeConnection(this);
         }
     }
 
-    /**
-     * Conveniance, ruft sendMessage(message,false) auf
-     *
-     * @param message Nachricht die übermittelt werden soll
-     */
     public void sendMessage(JComMessage message) {
         sendMessage(message, false);
     }
 
-
-    /**
-     * Allgemeines empfangen einer JComMessage-Instanz
-     *
-     * @return eingelesenes JComMessage
-     */
     public JComMessage receiveMessage() {
         JComMessage result = null;
         try {
-            result = this.inFromClient.readJCom();
+            result = this.fromClient.readJCom();
         } catch (UnmarshalException e) {
-            Logger.info("Connection.XmlError", e);
+            Logger.info(e.getLocalizedMessage(), e);
         } catch (IOException e) {
-            Logger.info("Connection.playerExitedUnexpected");
-            // entfernen des Spielers
+            Logger.info("Connection was closed unexpected", e);
             GameServer.getInstance().removeConnection(this);
         } catch (OutOfMemoryError e) {
-            Logger.error("Connection.MemoryLeak");
-            // TODO Wenn zulange Nachrichten geschickt werden
+            Logger.error(e.getLocalizedMessage(), e);
             GameServer.getInstance().removeConnection(this);
         } catch (IllegalArgumentException e) {
-            Logger.error("Connection.NegativeMessageSize");
-            // TODO Wenn negative Zahl als Länge geschickt wird
+            Logger.error("Message length can't be negative");
             GameServer.getInstance().removeConnection(this);
         }
         return result;
     }
 
-    /**
-     * Allgemeines Erwarten eines Login
-     *
-     * @return Neuer Client, bei einem Fehler jedoch null
-     */
     public Future<Client> login() {
         // ein Thread fuer einen Login. Weitere Logins in rufendender Schleife
-        clientFuture = executor.submit(new LoginTask(this));
+        clientFuture = loginQueueHandler.submit(new LoginTask(this));
         return clientFuture;
     }
 
-    /**
-     * Senden, dass Spieler diconnected wurde
-     */
     public void disconnect(ErrorType errortype) {
         try {
             Future<Client> clientFuture = this.clientFuture;
@@ -134,20 +109,17 @@ public class Connection {
             } else {
                 name = "<not logged in>";
             }
-            //   this.sendMessage(JComMessageFactory.createDisconnectMessage(this.id, name, errortype), false);
-
-        } catch (InterruptedException |
-                ExecutionException e) {
+            this.sendMessage(JComMessageFactory.createDisconnectMessage(this.id, name, errortype), false);
+        } catch (InterruptedException | ExecutionException e) {
             Logger.error("Connection.LoginInterrupted");
         }
-        terminateConnection();
+        closeConnection();
     }
 
-
-    private void terminateConnection() {
+    private void closeConnection() {
         try {
-            this.inFromClient.close();
-            this.outToClient.close();
+            this.fromClient.close();
+            this.toClient.close();
             this.socket.close();
         } catch (IOException e) {
             e.printStackTrace();
