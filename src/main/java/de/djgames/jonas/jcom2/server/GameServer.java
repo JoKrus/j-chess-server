@@ -27,7 +27,7 @@ public class GameServer {
     //Erstmal ohne Spectators
     private List<Future<Client>> connectedClients;
 
-    private List<String> connectedIPs;
+    private ScheduledThreadPoolExecutor heartBeatSender;
 
     private GameServer() {
         try {
@@ -37,39 +37,31 @@ public class GameServer {
             Logger.fatal("Server can't be started");
         }
         connectedClients = new ArrayList<>();
-        connectedIPs = new ArrayList<>();
 
-        ScheduledThreadPoolExecutor heartBeatSender = new ScheduledThreadPoolExecutor(1);
+        //TODO only send to people not currently playing
+        heartBeatSender = new ScheduledThreadPoolExecutor(1);
         heartBeatSender.scheduleAtFixedRate(() -> {
-            List<Future<Client>> needsRemoval = new ArrayList<>();
-            for (var clientFuture : connectedClients) {
-                Client client = null;
-                try {
-                    client = clientFuture.get();
-                } catch (InterruptedException | ExecutionException e) {
-                    needsRemoval.add(clientFuture);
-                }
+            try {
+                connectedClients.removeIf(clientFuture -> {
+                    //True removes
+                    Client client = null;
+                    try {
+                        client = clientFuture.get();
+                    } catch (InterruptedException | ExecutionException e) {
+                        return true;
+                    }
 
-                try {
-                    client.getConnection().sendMessage(JComMessageFactory.createHeartbeatMessage(client.getId()));
-                } catch (RemoveClientException e) {
-                    needsRemoval.add(clientFuture);
-                }
+                    try {
+                        client.getConnection().sendMessage(JComMessageFactory.createHeartbeatMessage(client.getId()));
+                    } catch (RemoveClientException e) {
+                        return true;
+                    }
+                    return false;
+                });
+            } catch (Throwable t) {
+                Logger.fatal(t.getLocalizedMessage(), t);
             }
-            for (var fC : needsRemoval) {
-                Client client = null;
-                try {
-                    client = fC.get();
-                } catch (InterruptedException | ExecutionException e) {
-                }
-                if (client == null) {
-                    removeConnection(null);
-                    break;
-                }
-                removeConnection(client.getConnection());
-            }
-            Logger.info("Removed " + needsRemoval.size() + " connections.");
-        }, 0, 25, TimeUnit.SECONDS);
+        }, 0, 15, TimeUnit.SECONDS);
 
     }
 
@@ -89,7 +81,6 @@ public class GameServer {
         } catch (IOException e) {
             Logger.info("Game.portUsed");
         }
-        connectedIPs = new ArrayList<>();
 
         final CyclicBarrier synchronousBarrier = new CyclicBarrier(2);
         Socket clientSocket = null;
@@ -137,21 +128,13 @@ public class GameServer {
                     Logger.error(e.getMessage(), e);
                 }
                 if (clientSocket != null) {
-                    // Nur eine Verbindung pro IP erlauben (Ausnahme localhost)
-                    InetAddress inetAddress = clientSocket.getInetAddress();
-                    String ip = inetAddress.getHostAddress();
-                    if (!connectedIPs.contains(ip)) {
-                        Connection connection = new Connection(clientSocket);
-
-                        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                        // Verbindung aufgebaut, zuerst login durchführen
-                        // asynchron
-                        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                        connectedClients.add(connection.login());
-                        Logger.info(connectedClients.size() + " Clienten connected");
-                    } else {
-                        Logger.info("Game.HostAlreadyConnected " + ip);
-                    }
+                    Connection connection = new Connection(clientSocket);
+                    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                    // Verbindung aufgebaut, zuerst login durchführen
+                    // asynchron
+                    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                    connectedClients.add(connection.login());
+                    Logger.info(connectedClients.size() + " Clienten connected");
                 } else
                     Logger.info("jClientSocket==null");
             } catch (InterruptedException e) {
@@ -162,46 +145,29 @@ public class GameServer {
         }
     }
 
-    public void addConnectedIP(String ip) {
-        connectedIPs.add(ip);
-    }
-
     public void cleanUpConnections() {
         //removes all clients with a null connection
         this.removeConnection(null);
     }
 
     public void removeConnection(Connection toRemove) {
-        try {
-            boolean removed;
-            // Nicht waehrend Iteration Elemente rausloeschen!
-            // Finden des zu loeschenden Clients
-            List<Future<Client>> clientsToBeRemoved = connectedClients.stream()
-                    .filter(Future::isDone)
-                    .filter((client) -> {
-                        try {
-                            return (client.get().getId() == DEFAULT_UUID) || (client.get().getConnection().equals(toRemove));
-                        } catch (InterruptedException | ExecutionException e) {
-                            //remove interupted Logins to
-                            return true;
-                        }
-                    }).collect(Collectors.toList());
-
-            // Tatsaechliches Loeschen des Clients
-            for (Future<Client> clientToBeRemoved : clientsToBeRemoved) {
-                removed = connectedClients.remove(clientToBeRemoved);
-                if (removed) {
-                    if (clientToBeRemoved.isDone()) {
-                        Client client = clientToBeRemoved.get();
-                        if (client != null) {
-                            connectedIPs.remove(client.getConnection().getIpAddress().getHostAddress());
-                            //TODO remove von Game objekt
-                        }
+        boolean removed;
+        // Nicht waehrend Iteration Elemente rausloeschen!
+        // Finden des zu loeschenden Clients
+        List<Future<Client>> clientsToBeRemoved = connectedClients.stream()
+                .filter(Future::isDone)
+                .filter((client) -> {
+                    try {
+                        return (client.get().getId() == DEFAULT_UUID) || (client.get().getConnection().equals(toRemove));
+                    } catch (InterruptedException | ExecutionException e) {
+                        //remove interupted Logins to
+                        return true;
                     }
-                }
-            }
-        } catch (ExecutionException | InterruptedException e) {
-            Logger.error("Exception in GameServer.removeConnection", e);
+                }).collect(Collectors.toList());
+
+        // Tatsaechliches Loeschen des Clients
+        for (Future<Client> clientToBeRemoved : clientsToBeRemoved) {
+            removed = connectedClients.remove(clientToBeRemoved);
         }
     }
 

@@ -54,7 +54,13 @@ public class Connection {
         return socket.getInetAddress();
     }
 
-    public void sendMessage(JComMessage jComMessage, boolean withTimer) {
+    /**
+     * @param jComMessage    m
+     * @param withTimer      wT
+     * @param surpressRemove removed already oder wirft excep
+     * @throws RemoveClientException wenn sR false und fehler kam
+     */
+    public void sendMessage(JComMessage jComMessage, boolean withTimer, boolean surpressRemove) throws RemoveClientException {
         if (withTimer) {
             //   this.timeOutManager.startSendMessageTimeOut(this.id, this);
         }
@@ -62,17 +68,28 @@ public class Connection {
             jComMessage.setId(this.id.toString());
             this.toClient.write(jComMessage);
         } catch (SocketException e) {
-            Logger.info("Connection was closed unexpected", e);
-            GameServer.getInstance().removeConnection(this);
-            throw new RemoveClientException(e.getMessage(), e);
+            Logger.info("Connection was closed unexpected");
+            if (surpressRemove) {
+                GameServer.getInstance().removeConnection(this);
+            } else {
+                throw new RemoveClientException(e.getMessage(), e);
+            }
         } catch (IOException e2) {
             Logger.info("Connection was closed unexpected", e2);
-            GameServer.getInstance().removeConnection(this);
+            if (surpressRemove) {
+                GameServer.getInstance().removeConnection(this);
+            } else {
+                throw new RemoveClientException(e2.getMessage(), e2);
+            }
         }
     }
 
+    public void sendMessage(JComMessage message, boolean withTimer) {
+        sendMessage(message, withTimer, false);
+    }
+
     public void sendMessage(JComMessage message) {
-        sendMessage(message, false);
+        sendMessage(message, false, false);
     }
 
     public JComMessage receiveMessage() {

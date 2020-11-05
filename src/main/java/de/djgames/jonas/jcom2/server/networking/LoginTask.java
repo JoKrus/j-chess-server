@@ -1,6 +1,5 @@
 package de.djgames.jonas.jcom2.server.networking;
 
-import de.djgames.jonas.jcom2.server.GameServer;
 import de.djgames.jonas.jcom2.server.generated.ErrorType;
 import de.djgames.jonas.jcom2.server.generated.JComMessage;
 import de.djgames.jonas.jcom2.server.generated.JComMessageType;
@@ -47,10 +46,6 @@ public class LoginTask implements Callable<Client> {
                 this.id = UUID.randomUUID();
 
                 Logger.info("Spieler verbunden. ID=" + this.id);
-
-                if (!connection.getIpAddress().isLoopbackAddress()) {
-                    GameServer.getInstance().addConnectedIP(connection.getIpAddress().getHostAddress());
-                }
 
                 this.client = new Client(this.id, cleanUpName(loginMessage.getLogin().getName()), connection);
 

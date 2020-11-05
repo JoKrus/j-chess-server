@@ -10,7 +10,6 @@ import java.util.Date;
  * Class to log actions. Currently implemented to create log files
  */
 public class Logger {
-
     public static final LogLevel minLevel = LogLevel.DEBUG;
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
     private static final String CONSOLE_STRING_TEMPLATE = "[%s] - %s - %s";
@@ -21,8 +20,10 @@ public class Logger {
             return;
         }
         System.out.println(message);
-        if (throwable != null)
+        if (throwable != null) {
+            System.err.println("Logged exception:");
             throwable.printStackTrace();
+        }
     }
 
     public static void debug(Object msg) {
