@@ -3,13 +3,13 @@ package de.djgames.jonas.jcom2.server.networking;
 import de.djgames.jonas.jcom2.server.generated.ErrorType;
 import de.djgames.jonas.jcom2.server.generated.JComMessage;
 import de.djgames.jonas.jcom2.server.generated.JComMessageType;
-import de.djgames.jonas.jcom2.server.logging.Logger;
 import de.djgames.jonas.jcom2.server.settings.Settings;
 
 import java.text.Normalizer;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 
+import static de.djgames.jonas.jcom2.server.StartServer.logger;
 import static de.djgames.jonas.jcom2.server.networking.Defaults.DEFAULT_UUID;
 
 public class LoginTask implements Callable<Client> {
@@ -41,11 +41,11 @@ public class LoginTask implements Callable<Client> {
         int failCounter = 0;
         while (failCounter < Settings.LOGINTRIES) {
             if (loginMessage != null && loginMessage.getMessageType() == JComMessageType.LOGIN) {
-                Logger.info("Player tries to log in");
+                logger.info("Player tries to log in");
 
                 this.id = UUID.randomUUID();
 
-                Logger.info("Spieler verbunden. ID=" + this.id);
+                logger.info("Spieler verbunden. ID=" + this.id);
 
                 this.client = new Client(this.id, cleanUpName(loginMessage.getLogin().getName()), connection);
 
@@ -56,7 +56,7 @@ public class LoginTask implements Callable<Client> {
             if (!this.id.equals(DEFAULT_UUID)) {
                 connection.setId(this.id);
                 this.connection.sendMessage(JComMessageFactory.createLoginReplyMessage(this.id), false);
-                Logger.info("Login erfolgreich: " + client.getId() + " | " + client.getName());
+                logger.info("Login erfolgreich: " + client.getId() + " | " + client.getName());
                 return this.client;
             }
 
@@ -69,7 +69,7 @@ public class LoginTask implements Callable<Client> {
         }
         // Verlassen mit schwerem Fehlerfall
         // ID wird wieder freigegeben
-        Logger.info("Client hat versagt sich einzuloggen: " + this.id);
+        logger.info("Client hat versagt sich einzuloggen: " + this.id);
         this.connection.disconnect(ErrorType.TOO_MANY_TRIES);
         return new Client(DEFAULT_UUID, "notLoggedIn", this.connection);
     }

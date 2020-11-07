@@ -1,7 +1,6 @@
 package de.djgames.jonas.jcom2.server.networking;
 
 import de.djgames.jonas.jcom2.server.generated.JComMessage;
-import de.djgames.jonas.jcom2.server.logging.Logger;
 import org.xml.sax.SAXException;
 
 import javax.xml.XMLConstants;
@@ -15,6 +14,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.net.URL;
+
+import static de.djgames.jonas.jcom2.server.StartServer.logger;
 
 public class XmlInputStream extends StringInputStream {
 
@@ -32,10 +33,10 @@ public class XmlInputStream extends StringInputStream {
                 unmarshaller.setSchema(schema);
                 unmarshaller.setEventHandler(validationEvent -> false);
             } catch (SAXException e) {
-                Logger.fatal(e.getLocalizedMessage(), e);
+                logger.fatal(e.getLocalizedMessage(), e);
             }
         } catch (JAXBException e) {
-            Logger.fatal(e.getLocalizedMessage(), e);
+            logger.fatal(e.getLocalizedMessage(), e);
         }
     }
 
@@ -51,7 +52,7 @@ public class XmlInputStream extends StringInputStream {
         } catch (UnmarshalException e) {
             throw e;
         } catch (JAXBException | NullPointerException e) {
-            Logger.error(e.getLocalizedMessage(), e);
+            logger.error(e.getLocalizedMessage(), e);
         }
         return result;
     }

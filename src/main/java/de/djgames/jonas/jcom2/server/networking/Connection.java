@@ -4,7 +4,6 @@ import de.djgames.jonas.jcom2.server.GameServer;
 import de.djgames.jonas.jcom2.server.exceptions.RemoveClientException;
 import de.djgames.jonas.jcom2.server.generated.ErrorType;
 import de.djgames.jonas.jcom2.server.generated.JComMessage;
-import de.djgames.jonas.jcom2.server.logging.Logger;
 
 import javax.xml.bind.UnmarshalException;
 import java.io.IOException;
@@ -17,6 +16,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+
+import static de.djgames.jonas.jcom2.server.StartServer.logger;
 
 public class Connection {
     private final static ExecutorService loginQueueHandler = Executors.newFixedThreadPool(4);
@@ -32,12 +33,12 @@ public class Connection {
         try {
             this.fromClient = new XmlInputStream(this.socket.getInputStream());
         } catch (IOException e) {
-            Logger.error("Could not open InputStream", e);
+            logger.error("Could not open InputStream", e);
         }
         try {
             this.toClient = new XmlOutputStream(this.socket.getOutputStream());
         } catch (IOException e) {
-            Logger.error("Could not open Output Stream", e);
+            logger.error("Could not open Output Stream", e);
         }
     }
 
@@ -68,14 +69,14 @@ public class Connection {
             jComMessage.setId(this.id.toString());
             this.toClient.write(jComMessage);
         } catch (SocketException e) {
-            Logger.info("Connection was closed unexpected");
+            logger.info("Connection was closed unexpected");
             if (surpressRemove) {
                 GameServer.getInstance().removeConnection(this);
             } else {
                 throw new RemoveClientException(e.getMessage(), e);
             }
         } catch (IOException e2) {
-            Logger.info("Connection was closed unexpected", e2);
+            logger.info("Connection was closed unexpected", e2);
             if (surpressRemove) {
                 GameServer.getInstance().removeConnection(this);
             } else {
@@ -97,15 +98,15 @@ public class Connection {
         try {
             result = this.fromClient.readJCom();
         } catch (UnmarshalException e) {
-            Logger.info(e.getLocalizedMessage(), e);
+            logger.info(e.getLocalizedMessage(), e);
         } catch (IOException e) {
-            Logger.info("Connection was closed unexpected", e);
+            logger.info("Connection was closed unexpected", e);
             GameServer.getInstance().removeConnection(this);
         } catch (OutOfMemoryError e) {
-            Logger.error(e.getLocalizedMessage(), e);
+            logger.error(e.getLocalizedMessage(), e);
             GameServer.getInstance().removeConnection(this);
         } catch (IllegalArgumentException e) {
-            Logger.error("Message length can't be negative");
+            logger.error("Message length can't be negative");
             GameServer.getInstance().removeConnection(this);
         }
         return result;
@@ -128,7 +129,7 @@ public class Connection {
             }
             this.sendMessage(JComMessageFactory.createDisconnectMessage(this.id, name, errortype), false);
         } catch (InterruptedException | ExecutionException e) {
-            Logger.error("Connection.LoginInterrupted");
+            logger.error("Connection.LoginInterrupted");
         }
         closeConnection();
     }
@@ -142,7 +143,7 @@ public class Connection {
             e.printStackTrace();
         }
         GameServer.getInstance().removeConnection(this);
-        Logger.info(socket.getInetAddress() + " wurde entfernt");
+        logger.info(socket.getInetAddress() + " wurde entfernt");
     }
 
     @Override

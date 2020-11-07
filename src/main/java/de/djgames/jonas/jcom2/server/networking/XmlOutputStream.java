@@ -1,7 +1,6 @@
 package de.djgames.jonas.jcom2.server.networking;
 
 import de.djgames.jonas.jcom2.server.generated.JComMessage;
-import de.djgames.jonas.jcom2.server.logging.Logger;
 import org.xml.sax.SAXException;
 
 import javax.xml.XMLConstants;
@@ -13,6 +12,8 @@ import javax.xml.validation.SchemaFactory;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringWriter;
+
+import static de.djgames.jonas.jcom2.server.StartServer.logger;
 
 public class XmlOutputStream extends StringOutputStream {
 
@@ -30,7 +31,7 @@ public class XmlOutputStream extends StringOutputStream {
             marshaller.setSchema(schema);
             marshaller.setEventHandler(event -> true);
         } catch (JAXBException | SAXException e) {
-            Logger.error("XmlOutputStream.ErrorInitialisingJAXBComponent", e);
+            logger.error("XmlOutputStream.ErrorInitialisingJAXBComponent", e);
         }
     }
 
@@ -41,7 +42,7 @@ public class XmlOutputStream extends StringOutputStream {
             this.writeString(jComToXML(jComMessage));
             this.flush();
         } catch (JAXBException e) {
-            Logger.error("XmlOutputStream.errorSendingMessage", e);
+            logger.error("XmlOutputStream.errorSendingMessage", e);
         }
     }
 

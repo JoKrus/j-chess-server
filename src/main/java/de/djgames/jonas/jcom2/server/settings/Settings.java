@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import static de.djgames.jonas.jcom2.server.StartServer.logger;
+
 public class Settings {
     public static final String S_PORT = "PORT";
     private static final int DEF_PORT = 5123;
@@ -15,7 +17,7 @@ public class Settings {
     /**
      * Den Detailgrad der Ausgaben festlegen
      */
-    public static Logger.LogLevel DEBUG_LEVEL = Logger.minLevel;
+    public static Logger.LoggingLevel DEBUG_LEVEL = logger.minimumLevel;
 
     public static final String S_MAX_NAME_LENGTH = "MAX_NAME_LENGTH";
     /**
@@ -48,7 +50,7 @@ public class Settings {
             try (InputStream propStream = new FileInputStream(new File(path))) {
                 properties.load(propStream);
             } catch (IOException e) {
-                Logger.error("Settings.configNotFound");
+                logger.error("Settings.configNotFound");
             }
         }
 

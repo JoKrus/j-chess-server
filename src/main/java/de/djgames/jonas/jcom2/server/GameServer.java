@@ -1,7 +1,6 @@
 package de.djgames.jonas.jcom2.server;
 
 import de.djgames.jonas.jcom2.server.exceptions.RemoveClientException;
-import de.djgames.jonas.jcom2.server.logging.Logger;
 import de.djgames.jonas.jcom2.server.networking.Client;
 import de.djgames.jonas.jcom2.server.networking.Connection;
 import de.djgames.jonas.jcom2.server.networking.ConnectionAccepter;
@@ -16,6 +15,7 @@ import java.util.List;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
+import static de.djgames.jonas.jcom2.server.StartServer.logger;
 import static de.djgames.jonas.jcom2.server.networking.Defaults.DEFAULT_UUID;
 
 public class GameServer {
@@ -34,7 +34,7 @@ public class GameServer {
             serverSocket = new ServerSocket(Settings.PORT);
 
         } catch (IOException e) {
-            Logger.fatal("Server can't be started");
+            logger.fatal("Server can't be started");
         }
         connectedClients = new ArrayList<>();
 
@@ -59,7 +59,7 @@ public class GameServer {
                     return false;
                 });
             } catch (Throwable t) {
-                Logger.fatal(t.getLocalizedMessage(), t);
+                logger.fatal(t.getLocalizedMessage(), t);
             }
         }, 0, 15, TimeUnit.SECONDS);
 
@@ -79,7 +79,7 @@ public class GameServer {
             // unverschluesselt
             serverSocket = new ServerSocket(Settings.PORT);
         } catch (IOException e) {
-            Logger.info("Game.portUsed");
+            logger.info("Game.portUsed");
         }
 
         final CyclicBarrier synchronousBarrier = new CyclicBarrier(2);
@@ -93,7 +93,7 @@ public class GameServer {
             try {
                 cleanUpConnections();
                 clientSocket = null;
-                Logger.info("Game.waitingForConnections");
+                logger.info("Game.waitingForConnections");
                 // Neustart des benutzten serverSockets
                 //synchronousBarrier.reset(); rausnehmen wegen Exception?
                 if (noSSLSocketFuture == null || noSSLSocketFuture.isDone()) {
@@ -125,7 +125,7 @@ public class GameServer {
                         }
                     }
                 } catch (ExecutionException e) {
-                    Logger.error(e.getMessage(), e);
+                    logger.error(e.getMessage(), e);
                 }
                 if (clientSocket != null) {
                     Connection connection = new Connection(clientSocket);
@@ -134,13 +134,13 @@ public class GameServer {
                     // asynchron
                     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                     connectedClients.add(connection.login());
-                    Logger.info(connectedClients.size() + " Clienten connected");
+                    logger.info(connectedClients.size() + " Clienten connected");
                 } else
-                    Logger.info("jClientSocket==null");
+                    logger.info("jClientSocket==null");
             } catch (InterruptedException e) {
-                Logger.info("Game.playerWaitingTimedOut");
+                logger.info("Game.playerWaitingTimedOut");
             } catch (BrokenBarrierException e) {
-                Logger.error(e.getMessage(), e);
+                logger.error(e.getMessage(), e);
             }
         }
     }
@@ -183,7 +183,7 @@ public class GameServer {
         try {
             networkInterfaces = NetworkInterface.getNetworkInterfaces();
         } catch (SocketException e) {
-            Logger.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
         }
         if (networkInterfaces == null) throw new RuntimeException("Could not get NetworkInterfaces");
 
@@ -194,7 +194,7 @@ public class GameServer {
                 InetAddress inetAddress = inetAdresses.nextElement();
                 // nur die IPv4-Adressen ausgeben
                 if (inetAddress instanceof Inet4Address)
-                    Logger.info(String.format("Server listening on %s:%d", inetAddress.getHostAddress(), serverPort));
+                    logger.info(String.format("Server listening on %s:%d", inetAddress.getHostAddress(), serverPort));
             }
         }
     }

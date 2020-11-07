@@ -1,15 +1,19 @@
 package de.djgames.jonas.jcom2.server;
 
 import de.djgames.jonas.jcom2.server.logging.Logger;
+import de.djgames.jonas.jcom2.server.logging.LoggerBuilder;
 import de.djgames.jonas.jcom2.server.settings.Settings;
 import org.apache.commons.cli.*;
 
+import java.text.SimpleDateFormat;
+
 public class StartServer {
     static String configPath = null;
+    public static Logger logger = LoggerBuilder.init().format(new SimpleDateFormat("dd.MM.yyyy HH:mm:ss"))
+            .addWriteStream(System.out, System.err).minimumLevel(Logger.LoggingLevel.DEBUG).build();
 
     public static void main(String[] args) {
         parseArgs(args);
-        Logger.info(configPath);
         // Wenn mit null aufgerufen, werden Standardwerte benutzt
         Settings.reload(configPath);
         GameServer.getInstance().waitForConnections();

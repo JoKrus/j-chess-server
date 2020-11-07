@@ -1,13 +1,13 @@
 package de.djgames.jonas.jcom2.server.networking;
 
-import de.djgames.jonas.jcom2.server.logging.Logger;
-
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CyclicBarrier;
+
+import static de.djgames.jonas.jcom2.server.StartServer.logger;
 
 public class ConnectionAccepter implements Callable<Socket> {
     private final ServerSocket serverSocket;
@@ -24,15 +24,15 @@ public class ConnectionAccepter implements Callable<Socket> {
         try {
             incomingSocket = serverSocket.accept();
         } catch (IOException e) {
-            Logger.error("Game.errorWhileConnecting" + " (Port:" + serverSocket.getLocalPort() + ")", e);
+            logger.error("Game.errorWhileConnecting" + " (Port:" + serverSocket.getLocalPort() + ")", e);
         }
         try {
             synchronousBarrier.await();
         } catch (InterruptedException | BrokenBarrierException e) {
-            Logger.error("", e);
+            logger.error("", e);
         }
         if (incomingSocket == null)
-            Logger.info("Incoming Socket is null");
+            logger.info("Incoming Socket is null");
         return incomingSocket;
     }
 }
