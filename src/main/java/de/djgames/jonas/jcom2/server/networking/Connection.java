@@ -4,6 +4,8 @@ import de.djgames.jonas.jcom2.server.GameServer;
 import de.djgames.jonas.jcom2.server.exceptions.RemoveClientException;
 import de.djgames.jonas.jcom2.server.generated.ErrorType;
 import de.djgames.jonas.jcom2.server.generated.JComMessage;
+import de.djgames.jonas.jcom2.server.networking_own.JComInputStream;
+import de.djgames.jonas.jcom2.server.networking_own.JComOutputStream;
 
 import javax.xml.bind.UnmarshalException;
 import java.io.IOException;
@@ -24,19 +26,19 @@ public class Connection {
 
     public final Socket socket;
     private Future<Client> clientFuture;
-    private XmlInputStream fromClient;
-    private XmlOutputStream toClient;
+    private JComInputStream fromClient;
+    private JComOutputStream toClient;
     private UUID id;
 
     public Connection(Socket socket) {
         this.socket = socket;
         try {
-            this.fromClient = new XmlInputStream(this.socket.getInputStream());
+            this.fromClient = new JComInputStream(this.socket.getInputStream());
         } catch (IOException e) {
             logger.error("Could not open InputStream", e);
         }
         try {
-            this.toClient = new XmlOutputStream(this.socket.getOutputStream());
+            this.toClient = new JComOutputStream(this.socket.getOutputStream());
         } catch (IOException e) {
             logger.error("Could not open Output Stream", e);
         }

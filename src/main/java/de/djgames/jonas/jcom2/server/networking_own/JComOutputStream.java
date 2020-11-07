@@ -1,6 +1,7 @@
-package de.djgames.jonas.jcom2.server.networking;
+package de.djgames.jonas.jcom2.server.networking_own;
 
 import de.djgames.jonas.jcom2.server.generated.JComMessage;
+import org.apache.commons.io.IOUtils;
 import org.xml.sax.SAXException;
 
 import javax.xml.XMLConstants;
@@ -12,16 +13,17 @@ import javax.xml.validation.SchemaFactory;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringWriter;
+import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 
 import static de.djgames.jonas.jcom2.server.StartServer.logger;
 
-public class XmlOutputStream extends StringOutputStream {
-
+public class JComOutputStream {
+    private final OutputStream outputStream;
     private Marshaller marshaller;
 
-    public XmlOutputStream(OutputStream outputStream) {
-        super(outputStream);
-        // Anlegen der JAXB-Komponenten
+    public JComOutputStream(OutputStream outputStream) {
+        this.outputStream = outputStream;
         try {
             SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
             Schema schema = sf.newSchema(getClass().getResource("/xsd/jComMessage.xsd"));
@@ -31,14 +33,24 @@ public class XmlOutputStream extends StringOutputStream {
             marshaller.setSchema(schema);
             marshaller.setEventHandler(event -> false);
         } catch (JAXBException | SAXException e) {
-            logger.error(e.getLocalizedMessage(), e);
+            logger.fatal(e.getLocalizedMessage(), e);
+            throw new RuntimeException(e);
         }
     }
 
+    private void writeString(String text) throws IOException {
+        byte[] header = new BigInteger(Integer.toString(text.length())).toByteArray();
+        //header does not return 4 bytes
+        byte[] headerToSend = new byte[4];
+        System.arraycopy(header, 0, headerToSend, 4 - header.length, header.length);
+
+        IOUtils.write(headerToSend, outputStream);
+        IOUtils.write(text, outputStream, StandardCharsets.UTF_8);
+    }
+
+    //TODO return success?
     public void write(JComMessage jComMessage) throws IOException {
-        // Generierung des fertigen XML
         try {
-            // Versenden des XML
             this.writeString(jComToXML(jComMessage));
             this.flush();
         } catch (JAXBException e) {
@@ -50,5 +62,13 @@ public class XmlOutputStream extends StringOutputStream {
         StringWriter stringWriter = new StringWriter();
         this.marshaller.marshal(jComMessage, stringWriter);
         return stringWriter.toString();
+    }
+
+    public void flush() throws IOException {
+        outputStream.flush();
+    }
+
+    public void close() throws IOException {
+        this.outputStream.close();
     }
 }
