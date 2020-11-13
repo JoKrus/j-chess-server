@@ -1,4 +1,4 @@
-package de.djgames.jonas.jcom2.server.networking_own;
+package de.djgames.jonas.jcom2.server.networking;
 
 import de.djgames.jonas.jcom2.server.generated.JComMessage;
 import org.apache.commons.io.IOUtils;
@@ -7,7 +7,6 @@ import org.xml.sax.SAXException;
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.UnmarshalException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
@@ -28,13 +27,13 @@ public class JComInputStream {
         this.inputStream = inputStream;
         try {
             JAXBContext jaxbContext = JAXBContext.newInstance(JComMessage.class);
-            unmarshaller = jaxbContext.createUnmarshaller();
+            this.unmarshaller = jaxbContext.createUnmarshaller();
             SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
             try {
                 URL urlToXsd = getClass().getResource("/xsd/jComMessage.xsd");
                 Schema schema = schemaFactory.newSchema(urlToXsd);
-                unmarshaller.setSchema(schema);
-                unmarshaller.setEventHandler(validationEvent -> false);
+                this.unmarshaller.setSchema(schema);
+                this.unmarshaller.setEventHandler(validationEvent -> false);
             } catch (SAXException e) {
                 logger.fatal(e.getLocalizedMessage(), e);
                 throw new RuntimeException(e);
@@ -48,23 +47,21 @@ public class JComInputStream {
     private String readMessage() throws IOException {
         int messageLength = readHeader();
         byte[] message = new byte[messageLength];
-        IOUtils.read(inputStream, message);
+        IOUtils.read(this.inputStream, message);
         return new String(message, StandardCharsets.UTF_8);
     }
 
     private int readHeader() throws IOException {
         byte[] textLength = new byte[4];
-        IOUtils.read(inputStream, textLength);
+        IOUtils.read(this.inputStream, textLength);
         return new BigInteger(textLength).intValue();
     }
 
-    public JComMessage readJCom() throws IOException, UnmarshalException {
+    public JComMessage readJCom() throws IOException {
         JComMessage result = null;
         try {
             String xml = this.readMessage();
             result = XMLToJCom(xml);
-        } catch (UnmarshalException e) {
-            throw e;
         } catch (JAXBException | NullPointerException e) {
             logger.error(e.getLocalizedMessage(), e);
         }

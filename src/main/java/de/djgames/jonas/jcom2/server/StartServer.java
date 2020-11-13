@@ -15,8 +15,8 @@ public class StartServer {
     public static void main(String[] args) {
         parseArgs(args);
         // Wenn mit null aufgerufen, werden Standardwerte benutzt
-        Settings.reload(configPath);
-        GameServer.getInstance().waitForConnections();
+        Settings.load(configPath);
+        Server.getInstance().waitForConnections();
     }
 
     public static void parseArgs(String[] args) {

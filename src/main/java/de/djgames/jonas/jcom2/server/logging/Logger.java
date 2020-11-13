@@ -26,13 +26,13 @@ public class Logger {
     }
 
     private void log(Object msg, Throwable throwable, LoggingLevel loggingLevel) {
-        if (loggingLevel.getSeverity() < minimumLevel.getSeverity()) {
+        if (loggingLevel.getSeverity() < this.minimumLevel.getSeverity()) {
             return;
         }
         String message = String.format(MESSAGE_TEMPLATE,
-                format.format(Date.from(Instant.now())), StringUtils.center(loggingLevel.toString(),
+                this.format.format(Date.from(Instant.now())), StringUtils.center(loggingLevel.toString(),
                         LoggingLevel.MAX_NAME_LENGTH), msg);
-        for (var wObj : writeObjects) {
+        for (var wObj : this.writeObjects) {
             try {
                 IOUtils.write(message, wObj.getMessageOutputStream(), StandardCharsets.UTF_8);
             } catch (IOException e) {
@@ -113,7 +113,7 @@ public class Logger {
         }
 
         public int getSeverity() {
-            return severity;
+            return this.severity;
         }
     }
 }

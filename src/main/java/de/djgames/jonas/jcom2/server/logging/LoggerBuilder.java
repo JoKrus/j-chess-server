@@ -32,17 +32,17 @@ public class LoggerBuilder {
     }
 
     public LoggerBuilder addWriteStream(OutputStream outputStream, boolean withErrors) {
-        outputStreams.add(new WriteObject(outputStream, withErrors ? outputStream : OutputStream.nullOutputStream()));
+        this.outputStreams.add(new WriteObject(outputStream, withErrors ? outputStream : OutputStream.nullOutputStream()));
         return this;
     }
 
     public LoggerBuilder addWriteStream(OutputStream messageOS, OutputStream errorOS) {
-        outputStreams.add(new WriteObject(messageOS, errorOS));
+        this.outputStreams.add(new WriteObject(messageOS, errorOS));
         return this;
     }
 
     public Logger build() {
-        return new Logger(outputStreams, minimumLevel, format);
+        return new Logger(this.outputStreams, this.minimumLevel, this.format);
     }
 
     public static class WriteObject {
@@ -55,11 +55,11 @@ public class LoggerBuilder {
         }
 
         public OutputStream getMessageOutputStream() {
-            return messageOutputStream;
+            return this.messageOutputStream;
         }
 
         public OutputStream getErrorOutputStream() {
-            return errorOutputStream;
+            return this.errorOutputStream;
         }
     }
 }

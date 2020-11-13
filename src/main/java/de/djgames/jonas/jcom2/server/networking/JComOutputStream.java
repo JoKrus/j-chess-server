@@ -1,4 +1,4 @@
-package de.djgames.jonas.jcom2.server.networking_own;
+package de.djgames.jonas.jcom2.server.networking;
 
 import de.djgames.jonas.jcom2.server.generated.JComMessage;
 import org.apache.commons.io.IOUtils;
@@ -20,7 +20,7 @@ import static de.djgames.jonas.jcom2.server.StartServer.logger;
 
 public class JComOutputStream {
     private final OutputStream outputStream;
-    private Marshaller marshaller;
+    private final Marshaller marshaller;
 
     public JComOutputStream(OutputStream outputStream) {
         this.outputStream = outputStream;
@@ -29,9 +29,9 @@ public class JComOutputStream {
             Schema schema = sf.newSchema(getClass().getResource("/xsd/jComMessage.xsd"));
             JAXBContext jaxbContext = JAXBContext.newInstance(JComMessage.class);
             this.marshaller = jaxbContext.createMarshaller();
-            this.marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            marshaller.setSchema(schema);
-            marshaller.setEventHandler(event -> false);
+            this.marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, false);
+            this.marshaller.setSchema(schema);
+            this.marshaller.setEventHandler(event -> false);
         } catch (JAXBException | SAXException e) {
             logger.fatal(e.getLocalizedMessage(), e);
             throw new RuntimeException(e);
@@ -44,18 +44,19 @@ public class JComOutputStream {
         byte[] headerToSend = new byte[4];
         System.arraycopy(header, 0, headerToSend, 4 - header.length, header.length);
 
-        IOUtils.write(headerToSend, outputStream);
-        IOUtils.write(text, outputStream, StandardCharsets.UTF_8);
+        IOUtils.write(headerToSend, this.outputStream);
+        IOUtils.write(text, this.outputStream, StandardCharsets.UTF_8);
     }
 
-    //TODO return success?
-    public void write(JComMessage jComMessage) throws IOException {
+    public boolean write(JComMessage jComMessage) throws IOException {
         try {
             this.writeString(jComToXML(jComMessage));
             this.flush();
+            return true;
         } catch (JAXBException e) {
             logger.error(e.getLocalizedMessage(), e);
         }
+        return false;
     }
 
     public String jComToXML(JComMessage jComMessage) throws JAXBException {
@@ -65,7 +66,7 @@ public class JComOutputStream {
     }
 
     public void flush() throws IOException {
-        outputStream.flush();
+        this.outputStream.flush();
     }
 
     public void close() throws IOException {

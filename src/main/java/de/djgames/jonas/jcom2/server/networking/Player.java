@@ -1,4 +1,4 @@
-package de.djgames.jonas.jcom2.server.networking_own;
+package de.djgames.jonas.jcom2.server.networking;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -16,15 +16,15 @@ public class Player {
     }
 
     public UUID getId() {
-        return id;
+        return this.id;
     }
 
     public Communicator getCommunicator() {
-        return communicator;
+        return this.communicator;
     }
 
     public String getPlayerName() {
-        return playerName;
+        return this.playerName;
     }
 
     @Override
@@ -34,17 +34,17 @@ public class Player {
 
         Player player = (Player) o;
 
-        if (!Objects.equals(id, player.id)) return false;
-        if (!Objects.equals(communicator, player.communicator))
+        if (!Objects.equals(this.id, player.id)) return false;
+        if (!Objects.equals(this.communicator, player.communicator))
             return false;
-        return Objects.equals(playerName, player.playerName);
+        return Objects.equals(this.playerName, player.playerName);
     }
 
     @Override
     public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + (communicator != null ? communicator.hashCode() : 0);
-        result = 31 * result + (playerName != null ? playerName.hashCode() : 0);
+        int result = this.id != null ? this.id.hashCode() : 0;
+        result = 31 * result + (this.communicator != null ? this.communicator.hashCode() : 0);
+        result = 31 * result + (this.playerName != null ? this.playerName.hashCode() : 0);
         return result;
     }
 }
