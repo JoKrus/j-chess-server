@@ -7,12 +7,14 @@ public class Player {
     private final UUID id;
     private final Communicator communicator;
     private final String playerName;
+    private PlayerStatus status;
     //TODO role
 
     public Player(UUID id, Communicator communicator, String playerName) {
         this.id = id;
         this.communicator = communicator;
         this.playerName = playerName;
+        this.status = PlayerStatus.QUEUE;
     }
 
     public UUID getId() {
@@ -25,6 +27,14 @@ public class Player {
 
     public String getPlayerName() {
         return this.playerName;
+    }
+
+    public PlayerStatus getStatus() {
+        return this.status;
+    }
+
+    public void setStatus(PlayerStatus status) {
+        this.status = status;
     }
 
     @Override

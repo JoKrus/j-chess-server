@@ -7,6 +7,7 @@
             <xs:enumeration value="LoginReply"/>
             <xs:enumeration value="Accept"/>
             <xs:enumeration value="Disconnect"/>
+            <xs:enumeration value="GameFound"/>
         </xs:restriction>
     </xs:simpleType>
 
@@ -21,6 +22,7 @@
             <xs:enumeration value="TIMEOUT"/>
             <xs:enumeration value="TOO_MANY_TRIES"/>
             <xs:enumeration value="UNSUPPORTED_OPERATION"/>
+            <xs:enumeration value="DUPLICATE_NAME"/>
         </xs:restriction>
     </xs:simpleType>
 
@@ -32,9 +34,10 @@
                 <xs:element name="LoginReply" type="LoginReplyMessage"/>
                 <xs:element name="HeartBeat" type="HeartBeatMessage"/>
                 <xs:element name="Disconnect" type="DisconnectMessage"/>
+                <xs:element name="GameFound" type="GameFoundMessage"/>
             </xs:choice>
             <xs:attribute name="messageType" type="JComMessageType" use="required"/>
-            <xs:attribute name="id" type="UUID" use="required"/>
+            <xs:attribute name="playerId" type="UUID" use="required"/>
         </xs:complexType>
     </xs:element>
 
@@ -66,6 +69,13 @@
         <xs:sequence>
             <xs:element name="name" type="xs:string"/>
             <xs:element name="errorTypeCode" type="ErrorType"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="GameFoundMessage">
+        <xs:sequence>
+            <xs:element name="gameId" type="UUID"/>
+            <xs:element name="enemyName" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
 

@@ -3,6 +3,7 @@ package de.djgames.jonas.jcom2.server;
 import de.djgames.jonas.jcom2.server.networking.Communicator;
 import de.djgames.jonas.jcom2.server.networking.JComMessageFactory;
 import de.djgames.jonas.jcom2.server.networking.Player;
+import de.djgames.jonas.jcom2.server.networking.PlayerStatus;
 import de.djgames.jonas.jcom2.server.settings.Settings;
 
 import java.io.IOException;
@@ -10,8 +11,10 @@ import java.net.*;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static de.djgames.jonas.jcom2.server.StartServer.logger;
 import static de.djgames.jonas.jcom2.server.networking.Defaults.DEFAULT_UUID;
@@ -34,7 +37,6 @@ public class Server {
         }
         this.connectedPlayers = new ArrayList<>();
 
-        //TODO only send to people not currently playing
         ScheduledThreadPoolExecutor heartBeatSender = new ScheduledThreadPoolExecutor(1);
         heartBeatSender.scheduleAtFixedRate(() -> {
             try {
@@ -45,6 +47,31 @@ public class Server {
             }
         }, 0, 15, TimeUnit.SECONDS);
 
+        ScheduledThreadPoolExecutor matchMaker = new ScheduledThreadPoolExecutor(1);
+        matchMaker.scheduleAtFixedRate(() -> {
+            var queueingPlayers =
+                    this.connectedPlayers.stream().filter(player -> player.getStatus() == PlayerStatus.QUEUE)
+                            .collect(Collectors.toList());
+            if (queueingPlayers.size() % 2 == 1) queueingPlayers.remove(queueingPlayers.size() - 1);
+
+            List<List<Player>> soonToBeMatches = new ArrayList<>();
+            final int MATCH_SIZE = 2;
+            for (int i = 0; i < queueingPlayers.size(); i += MATCH_SIZE) {
+                soonToBeMatches.add(queueingPlayers.subList(i, i + MATCH_SIZE));
+            }
+
+            for (var soonToBeMatch : soonToBeMatches) {
+                UUID matchId = UUID.randomUUID();
+                for (var player : soonToBeMatch) {
+                    player.getCommunicator().sendMessageOrRemove(
+                            JComMessageFactory.createGameFoundMessage(player.getId(), matchId,
+                                    //get other player
+                                    soonToBeMatch.stream().filter(player1 -> !player1.equals(player)).findFirst().get().getPlayerName()));
+                    player.setStatus(PlayerStatus.IN_GAME);
+                }
+            }
+
+        }, 0, 3, TimeUnit.SECONDS);
     }
 
     public static Server getInstance() {
@@ -63,6 +90,7 @@ public class Server {
                 if (clientSocket != null) {
                     Communicator communicator = new Communicator(clientSocket);
                     this.connectedPlayers.add(communicator.login());
+                    cleanUpPlayers();
                     logger.info(this.connectedPlayers.size() + " clients connected");
                 } else {
                     logger.info("client socket is null");
@@ -80,9 +108,12 @@ public class Server {
 
     public void removePlayer(Communicator toRemove) {
         this.connectedPlayers.removeIf(player ->
-                (player.getId() == DEFAULT_UUID) || (player.getCommunicator().equals(toRemove)));
+                (player == null || player.getId() == DEFAULT_UUID) || (player.getCommunicator().equals(toRemove)));
     }
 
+    public List<String> getConnectedPlayerNames() {
+        return this.connectedPlayers.stream().map(Player::getPlayerName).collect(Collectors.toList());
+    }
 
     private void printServerAddresses(ServerSocket serverSocket) {
         int serverPort = serverSocket.getLocalPort();

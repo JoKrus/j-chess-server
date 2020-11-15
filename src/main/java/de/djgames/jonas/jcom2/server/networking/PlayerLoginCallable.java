@@ -1,5 +1,6 @@
 package de.djgames.jonas.jcom2.server.networking;
 
+import de.djgames.jonas.jcom2.server.Server;
 import de.djgames.jonas.jcom2.server.generated.ErrorType;
 import de.djgames.jonas.jcom2.server.generated.JComMessage;
 import de.djgames.jonas.jcom2.server.generated.JComMessageType;
@@ -37,6 +38,13 @@ public class PlayerLoginCallable implements Callable<Player> {
                 LoginMessage loginMessage = message.getLogin();
                 String name = cleanUpName(loginMessage.getName());
                 UUID id = UUID.randomUUID();
+
+                if (Server.getInstance().getConnectedPlayerNames().contains(name)) {
+                    this.communicator.sendMessage(JComMessageFactory.createAcceptMessage(id, ErrorType.DUPLICATE_NAME));
+                    failedLoginCounter++;
+                    continue;
+                }
+
                 player = new Player(id, this.communicator, name);
             }
 

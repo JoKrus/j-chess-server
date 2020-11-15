@@ -14,7 +14,7 @@ import java.util.concurrent.Executors;
 import static de.djgames.jonas.jcom2.server.StartServer.logger;
 
 public class Communicator {
-    private final static ExecutorService loginQueueHandler = Executors.newFixedThreadPool(4);
+    private final static ExecutorService loginQueueHandler = Executors.newFixedThreadPool(1);
 
     private JComInputStream fromPlayer;
     private JComOutputStream toPlayer;
