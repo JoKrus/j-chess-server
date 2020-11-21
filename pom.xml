@@ -22,6 +22,21 @@
         <main.class>de.djgames.jonas.jcom2.server.StartServer</main.class>
     </properties>
 
+
+    <repositories>
+        <repository>
+            <id>github</id>
+            <name>GitHub JoKrus Maven Packages</name>
+            <url>https://maven.pkg.github.com/jokrus/JComJavaXsd</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
     <distributionManagement>
         <repository>
             <id>github</id>
