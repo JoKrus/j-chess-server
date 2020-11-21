@@ -25,7 +25,7 @@
 
     <repositories>
         <repository>
-            <id>github-java-xsd</id>
+            <id>github</id>
             <name>JCom Xsd Java Implementation</name>
             <url>https://maven.pkg.github.com/jokrus/JComJavaXsd</url>
             <releases>
