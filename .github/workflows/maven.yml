@@ -24,4 +24,6 @@ jobs:
       with:
         java-version: 11
     - name: Build with Maven
-      run: mvn -B package --file pom.xml
+      run: mvn -B package --file pom.xmlenv:
+      env:
+        GITHUB_TOKEN: ${{ secrets.TOKEN_WORKFLOW }}
