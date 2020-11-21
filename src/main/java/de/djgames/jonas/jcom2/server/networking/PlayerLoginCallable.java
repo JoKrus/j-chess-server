@@ -45,7 +45,6 @@ public class PlayerLoginCallable implements Callable<Player> {
                     failedLoginCounter++;
                     continue;
                 }
-
                 player = new Player(id, this.communicator, name);
             }
 
