@@ -1,6 +1,7 @@
 package de.djgames.jonas.jcom2.server.networking;
 
 import de.djgames.jonas.jcom2.server.Server;
+import de.djgames.jonas.jcom2.server.factory.JComMessageFactory;
 import de.djgames.jonas.jcom2.server.generated.ErrorType;
 import de.djgames.jonas.jcom2.server.generated.JComMessage;
 import de.djgames.jonas.jcom2.server.generated.JComMessageType;

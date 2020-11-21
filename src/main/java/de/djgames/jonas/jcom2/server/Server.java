@@ -1,7 +1,7 @@
 package de.djgames.jonas.jcom2.server;
 
+import de.djgames.jonas.jcom2.server.factory.JComMessageFactory;
 import de.djgames.jonas.jcom2.server.networking.Communicator;
-import de.djgames.jonas.jcom2.server.networking.JComMessageFactory;
 import de.djgames.jonas.jcom2.server.networking.Player;
 import de.djgames.jonas.jcom2.server.networking.PlayerStatus;
 import de.djgames.jonas.jcom2.server.settings.Settings;

@@ -2,6 +2,8 @@ package de.djgames.jonas.jcom2.server.networking;
 
 import de.djgames.jonas.jcom2.server.Server;
 import de.djgames.jonas.jcom2.server.generated.JComMessage;
+import de.djgames.jonas.jcom2.server.iostreams.JComInputStream;
+import de.djgames.jonas.jcom2.server.iostreams.JComOutputStream;
 
 import java.io.IOException;
 import java.net.Socket;
