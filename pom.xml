@@ -16,9 +16,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
-        <xsd.sources.dir>src/main/resources/xsd/jComMessage.xsd</xsd.sources.dir>
-        <generated.classes.dir>${project.build.sourceDirectory}</generated.classes.dir>
-        <generated.classes.package>${project.groupId}.generated</generated.classes.package>
         <main.class>de.djgames.jonas.jcom2.server.StartServer</main.class>
     </properties>
 
@@ -184,29 +181,6 @@
                 <configuration>
                     <mainClass>${main.class}</mainClass>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-xjc-plugin</artifactId>
-                <version>3.3.0</version>
-                <executions>
-                    <execution>
-                        <id>xjc</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>xsdtojava</goal>
-                        </goals>
-                        <configuration>
-                            <sourceRoot>${generated.classes.dir}</sourceRoot>
-                            <xsdOptions>
-                                <xsdOption>
-                                    <xsd>${basedir}/${xsd.sources.dir}</xsd>
-                                    <packagename>${generated.classes.package}</packagename>
-                                </xsdOption>
-                            </xsdOptions>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
