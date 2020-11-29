@@ -1,6 +1,7 @@
 package de.djgames.jonas.jcom2.server;
 
 import de.djgames.jonas.jcom2.server.factory.JComMessageFactory;
+import de.djgames.jonas.jcom2.server.logic.Match;
 import de.djgames.jonas.jcom2.server.networking.Communicator;
 import de.djgames.jonas.jcom2.server.networking.Player;
 import de.djgames.jonas.jcom2.server.networking.PlayerStatus;
@@ -8,10 +9,7 @@ import de.djgames.jonas.jcom2.server.settings.Settings;
 
 import java.io.IOException;
 import java.net.*;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -52,6 +50,8 @@ public class Server {
             var queueingPlayers =
                     this.connectedPlayers.stream().filter(player -> player.getStatus() == PlayerStatus.QUEUE)
                             .collect(Collectors.toList());
+            //TODO to ensure, player 3 also gets matched at some point, maybe take queue time into account
+            Collections.shuffle(queueingPlayers);
             if (queueingPlayers.size() % 2 == 1) queueingPlayers.remove(queueingPlayers.size() - 1);
 
             List<List<Player>> soonToBeMatches = new ArrayList<>();
@@ -62,13 +62,12 @@ public class Server {
 
             for (var soonToBeMatch : soonToBeMatches) {
                 UUID matchId = UUID.randomUUID();
-                for (var player : soonToBeMatch) {
-                    player.getCommunicator().sendMessageOrRemove(
-                            JComMessageFactory.createGameFoundMessage(player.getId(), matchId,
-                                    //get other player
-                                    soonToBeMatch.stream().filter(player1 -> !player1.equals(player)).findFirst().get().getPlayerName()));
-                    player.setStatus(PlayerStatus.IN_GAME);
-                }
+                Thread matchLogic = new Thread(() -> {
+                    Match match = new Match(soonToBeMatch, matchId);
+                    match.startMatch();
+                });
+                matchLogic.setName(matchId.toString());
+                matchLogic.start();
             }
 
         }, 0, 3, TimeUnit.SECONDS);

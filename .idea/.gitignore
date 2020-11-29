@@ -8,3 +8,5 @@
 /httpRequests/
 
 /jarRepositories.xml
+
+/**/*.iml
