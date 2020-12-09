@@ -26,6 +26,8 @@ public class Server {
     //Erstmal ohne Spectators
     private final List<Player> connectedPlayers;
 
+    //private final ExecutorService runningGamePoolExecutor = Executors.newWorkStealingPool();
+
     private Server() {
         try {
             this.serverSocket = new ServerSocket(Settings.getInt(Settings.PORT));
@@ -37,16 +39,26 @@ public class Server {
 
         ScheduledThreadPoolExecutor heartBeatSender = new ScheduledThreadPoolExecutor(1);
         heartBeatSender.scheduleAtFixedRate(() -> {
-            try {
-                this.connectedPlayers.removeIf(player ->
-                        !player.getCommunicator().sendMessage(JComMessageFactory.createHeartbeatMessage(player.getId())));
-            } catch (Throwable t) {
-                logger.fatal(t.getLocalizedMessage(), t);
+//            try {
+//                this.connectedPlayers.removeIf(player ->
+//                        !player.getCommunicator().sendMessage(JComMessageFactory.createHeartbeatMessage(player.getId())));
+//            } catch (Throwable t) {
+//                logger.fatal(t.getLocalizedMessage(), t);
+//            }
+            Iterator<Player> iP = this.connectedPlayers.iterator();
+            while (iP.hasNext()) {
+                var player = iP.next();
+                var result =
+                        player.getCommunicator().sendMessage(JComMessageFactory.createHeartbeatMessage(player.getId()));
+                if (result) {
+                    iP.remove();
+                }
             }
         }, 0, 15, TimeUnit.SECONDS);
 
         ScheduledThreadPoolExecutor matchMaker = new ScheduledThreadPoolExecutor(1);
         matchMaker.scheduleAtFixedRate(() -> {
+            logger.debug("Im blue");
             var queueingPlayers =
                     this.connectedPlayers.stream().filter(player -> player.getStatus() == PlayerStatus.QUEUE)
                             .collect(Collectors.toList());
@@ -62,12 +74,13 @@ public class Server {
 
             for (var soonToBeMatch : soonToBeMatches) {
                 UUID matchId = UUID.randomUUID();
-                Thread matchLogic = new Thread(() -> {
+                Thread t = new Thread(() -> {
                     Match match = new Match(soonToBeMatch, matchId);
                     match.startMatch();
                 });
-                matchLogic.setName(matchId.toString());
-                matchLogic.start();
+                t.setName(matchId.toString());
+                t.start();
+                //  this.runningGamePoolExecutor.submit();
             }
 
         }, 0, 3, TimeUnit.SECONDS);

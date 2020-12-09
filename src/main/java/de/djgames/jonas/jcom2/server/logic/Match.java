@@ -1,5 +1,6 @@
 package de.djgames.jonas.jcom2.server.logic;
 
+import de.djgames.jonas.jcom2.server.Server;
 import de.djgames.jonas.jcom2.server.factory.JComMessageFactory;
 import de.djgames.jonas.jcom2.server.generated.ErrorType;
 import de.djgames.jonas.jcom2.server.logic.map.GameMap;
@@ -27,6 +28,7 @@ public class Match {
     }
 
     public void startMatch() {
+        logger.info("Match " + this.matchId + ": Send found.");
         for (var player : this.playerList) {
             player.getCommunicator().sendMessageOrRemove(
                     JComMessageFactory.createGameFoundMessage(player.getId(), this.matchId,
@@ -38,11 +40,14 @@ public class Match {
         //index 0 is startPlayer
         Collections.shuffle(this.playerList, this.randomStart);
 
+        logger.info("Match " + this.matchId + ": Load map.");
         var mapString = "";
         try {
-            var currT = Thread.currentThread();
-            var loader = currT.getContextClassLoader();
-            InputStream is = loader.getResourceAsStream("maps/default.jmap");
+            var loader = Server.class.getClassLoader();
+            InputStream is = loader.getResourceAsStream("maps/testmap.jmap");
+            if (is == null) {
+                throw new IOException("Could not parse map path");
+            }
             mapString = IOUtils.toString(is, StandardCharsets.UTF_8);
         } catch (IOException e) {
             logger.error("Could not load map", e);
@@ -50,9 +55,15 @@ public class Match {
         this.gameMap = new GameMap(mapString);
         // logger.info("Map loaded:" + System.lineSeparator() + mapString);
 
+        logger.info("Match " + this.matchId + ": Send begin.");
         //BEGIN message mit namen von startSpieler und map
+        for (var player : this.playerList) {
+            player.getCommunicator().sendMessageOrRemove(
+                    JComMessageFactory.createBeginMessage(player.getId(), this.gameMap.toGameMapData(),
+                            this.playerList.get(0).getPlayerName()));
+        }
 
-
+        logger.info("Match " + this.matchId + ": starts now.");
         matchLogic();
     }
 
@@ -81,6 +92,8 @@ public class Match {
             player.getCommunicator().sendMessage(msg);
             player.setStatus(PlayerStatus.QUEUE);
         }
+        logger.info("Match " + this.matchId + ": is over.");
+
         //TODO maybe save game to sqlite or something
     }
 

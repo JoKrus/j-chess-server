@@ -6,7 +6,7 @@
 
     <groupId>de.djgames.jonas.jcom2.server</groupId>
     <artifactId>j-com-server2</artifactId>
-    <version>0.3.3</version>
+    <version>0.3.5</version>
 
     <name>JComServer2</name>
     <url>https://www.dj-games.de</url>
@@ -127,7 +127,7 @@
         <dependency>
             <groupId>de.djgames.jonas.jcom2.server</groupId>
             <artifactId>j-com-xsd-java</artifactId>
-            <version>0.3.3</version>
+            <version>0.3.5</version>
         </dependency>
     </dependencies>
 

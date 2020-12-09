@@ -1,6 +1,7 @@
 package de.djgames.jonas.jcom2.server.logic.map;
 
 import com.google.common.collect.HashBiMap;
+import de.djgames.jonas.jcom2.server.generated.GameMapData;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -20,6 +21,7 @@ public class GameMap {
     private MapObject[] objectList;
     private int length;
     private int height;
+    private String oneDimensionalMapString;
     //array[x * leny + y] anstatt
 
     private final HashBiMap<Coordinate, Character> characterHashBiMap = HashBiMap.create();
@@ -40,9 +42,18 @@ public class GameMap {
         return this.objectList[coordinate.y * this.length + coordinate.x];
     }
 
+    public GameMapData toGameMapData() {
+        var ret = new GameMapData();
+        ret.setHeight(this.height);
+        ret.setLength(this.length);
+        ret.setMapString(this.oneDimensionalMapString);
+        return ret;
+    }
+
     private void initalize(String mapString) {
         this.height = mapString.split("\n").length;
         mapString = mapString.replaceAll(regexMatcher, "");
+        this.oneDimensionalMapString = mapString;
         this.objectList = new MapObject[mapString.length()];
         this.length = mapString.length() / this.height;
         char[] charArray = mapString.toCharArray();
@@ -50,7 +61,6 @@ public class GameMap {
             char c = charArray[i];
             this.objectList[i] = new MapObject(c);
         }
-
     }
 
     private static String regexMatcher() {
