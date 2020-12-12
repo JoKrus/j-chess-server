@@ -78,8 +78,6 @@ public class Match {
                 player.getCommunicator().sendMessage(JComMessageFactory.createAcceptMessage(player.getId(),
                         ErrorType.NO_ERROR));
                 var answer = player.getCommunicator().receiveMessage();
-
-                logger.debug(answer.getMessageType() + " received by " + player.getPlayerName());
             }
             counter++;
             if (counter > 3) {

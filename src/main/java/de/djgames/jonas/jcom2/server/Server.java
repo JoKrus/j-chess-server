@@ -38,46 +38,47 @@ public class Server {
         this.connectedPlayers = new ArrayList<>();
 
         ScheduledThreadPoolExecutor heartBeatSender = new ScheduledThreadPoolExecutor(1);
-        // heartBeatSender.scheduleAtFixedRate(heartBeatSender(), 0, 15, TimeUnit.SECONDS);
+        heartBeatSender.scheduleAtFixedRate(this::heartBeatSender, 1, 15, TimeUnit.SECONDS);
 
         ScheduledThreadPoolExecutor matchMaker = new ScheduledThreadPoolExecutor(1);
-        matchMaker.scheduleAtFixedRate(() -> {
-            var queueingPlayers =
-                    this.connectedPlayers.stream().filter(player -> player.getStatus() == PlayerStatus.QUEUE)
-                            .collect(Collectors.toList());
-            //TODO to ensure, player 3 also gets matched at some point, maybe take queue time into account
-            Collections.shuffle(this.connectedPlayers);
-            if (queueingPlayers.size() % 2 == 1) queueingPlayers.remove(queueingPlayers.size() - 1);
-
-            List<List<Player>> soonToBeMatches = new ArrayList<>();
-            final int MATCH_SIZE = 2;
-            for (int i = 0; i < queueingPlayers.size(); i += MATCH_SIZE) {
-                soonToBeMatches.add(queueingPlayers.subList(i, i + MATCH_SIZE));
-            }
-
-            for (var soonToBeMatch : soonToBeMatches) {
-                UUID matchId = UUID.randomUUID();
-                Thread t = new Thread(() -> {
-                    Match match = new Match(soonToBeMatch, matchId);
-                    match.startMatch();
-                });
-                t.setName(matchId.toString());
-                t.start();
-                //  this.runningGamePoolExecutor.submit();
-            }
-
-        }, 0, 3, TimeUnit.SECONDS);
+        matchMaker.scheduleAtFixedRate(this::matchMaker, 0, 3, TimeUnit.SECONDS);
     }
 
-    private Runnable heartBeatSender() {
-        return () -> {
-            try {
-                this.connectedPlayers.removeIf(player ->
-                        !player.getCommunicator().sendMessage(JComMessageFactory.createHeartbeatMessage(player.getId())));
-            } catch (Throwable t) {
-                logger.fatal(t.getLocalizedMessage(), t);
-            }
-        };
+    private void matchMaker() {
+        logger.debug("Start matchmaking cycle");
+        var queueingPlayers =
+                this.connectedPlayers.stream().filter(player -> player.getStatus() == PlayerStatus.QUEUE)
+                        .collect(Collectors.toList());
+        //TODO to ensure, player 3 also gets matched at some point, maybe take queue time into account
+        Collections.shuffle(this.connectedPlayers);
+        if (queueingPlayers.size() % 2 == 1) queueingPlayers.remove(queueingPlayers.size() - 1);
+
+        List<List<Player>> soonToBeMatches = new ArrayList<>();
+        final int MATCH_SIZE = 2;
+        for (int i = 0; i < queueingPlayers.size(); i += MATCH_SIZE) {
+            soonToBeMatches.add(queueingPlayers.subList(i, i + MATCH_SIZE));
+        }
+
+        for (var soonToBeMatch : soonToBeMatches) {
+            UUID matchId = UUID.randomUUID();
+            Thread t = new Thread(() -> {
+                Match match = new Match(soonToBeMatch, matchId);
+                match.startMatch();
+            });
+            t.setName(matchId.toString());
+            t.start();
+            //  this.runningGamePoolExecutor.submit();
+        }
+    }
+
+    private void heartBeatSender() {
+        logger.debug("Start heartbeat cycle");
+        try {
+            this.connectedPlayers.removeIf(player ->
+                    !player.getCommunicator().sendMessage(JComMessageFactory.createHeartbeatMessage(player.getId())));
+        } catch (Throwable t) {
+            logger.fatal(t.getLocalizedMessage(), t);
+        }
     }
 
     public static Server getInstance() {
