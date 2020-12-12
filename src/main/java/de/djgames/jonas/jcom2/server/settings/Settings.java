@@ -19,11 +19,14 @@ public class Settings {
     public static final int PORT_DEFAULT = 5123;
     public static final String MAX_NAME_LENGTH = "MAX_NAME_LENGTH";
     public static final int MAX_NAME_LENGTH_DEFAULT = 30;
+    public static final String MATCH_TRIES = "MATCH_TRIES";
+    public static final int MATCH_TRIES_DEFAULT = 3;
 
     static {
         initDefault(LOGIN_TRIES, LOGIN_TRIES_DEFAULT);
         initDefault(PORT, PORT_DEFAULT);
         initDefault(MAX_NAME_LENGTH, MAX_NAME_LENGTH_DEFAULT);
+        initDefault(MATCH_TRIES, MATCH_TRIES_DEFAULT);
     }
 
     private static void initDefault(String keyName, int keyDefault) {
@@ -52,6 +55,7 @@ public class Settings {
         loadIntPreferenceFromProperty(prop, LOGIN_TRIES);
         loadIntPreferenceFromProperty(prop, PORT);
         loadIntPreferenceFromProperty(prop, MAX_NAME_LENGTH);
+        loadIntPreferenceFromProperty(prop, MATCH_TRIES);
     }
 
     private static void loadIntPreferenceFromProperty(Properties prop, String port) {

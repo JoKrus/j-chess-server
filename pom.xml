@@ -6,7 +6,7 @@
 
     <groupId>de.djgames.jonas.jcom2.server</groupId>
     <artifactId>j-com-server2</artifactId>
-    <version>0.3.7</version>
+    <version>0.4.0</version>
 
     <name>JComServer2</name>
     <url>https://www.dj-games.de</url>
@@ -43,6 +43,12 @@
     </distributionManagement>
 
     <dependencies>
+        <dependency>
+            <groupId>de.djgames.jonas.jcom2.server</groupId>
+            <artifactId>j-com-xsd-java</artifactId>
+            <version>0.4.0</version>
+        </dependency>
+
         <!--
         Copyright (c) 2013, 2020 Oracle and/or its affiliates. All rights reserved.
 
@@ -121,12 +127,6 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>30.0-jre</version>
-        </dependency>
-
-        <dependency>
-            <groupId>de.djgames.jonas.jcom2.server</groupId>
-            <artifactId>j-com-xsd-java</artifactId>
-            <version>0.3.6</version>
         </dependency>
     </dependencies>
 

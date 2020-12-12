@@ -2,6 +2,9 @@ package de.djgames.jonas.jcom2.server.logic.map;
 
 import com.google.common.collect.HashBiMap;
 import de.djgames.jonas.jcom2.server.generated.GameMapData;
+import de.djgames.jonas.jcom2.server.generated.Team;
+import de.djgames.jonas.jcom2.server.logic.unit.LogicHelpers;
+import de.djgames.jonas.jcom2.server.logic.unit.Soldier;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -9,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.UUID;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -24,7 +28,7 @@ public class GameMap {
     private String oneDimensionalMapString;
     //array[x * leny + y] anstatt
 
-    private final HashBiMap<Coordinate, Character> characterHashBiMap = HashBiMap.create();
+    private final HashBiMap<Coordinate, Soldier> soldierPositionBiMap = HashBiMap.create();
 
     public GameMap(InputStream is) throws IOException {
         this(IOUtils.toString(is, StandardCharsets.UTF_8));
@@ -40,6 +44,22 @@ public class GameMap {
 
     public MapObject getMapObjectAt(Coordinate coordinate) {
         return this.objectList[coordinate.y * this.length + coordinate.x];
+    }
+
+    public boolean spawnSoldier(Team team, Coordinate position) {
+        //needs to be a Spawn
+        if (team == null || getMapObjectAt(position).getType().getTeam() != team) {
+            return false;
+        }
+
+        UUID id = UUID.randomUUID();
+        var unitData = LogicHelpers.generateDefaultUnit(id, team.value() + id.toString());
+        Soldier soldier = new Soldier(unitData, team);
+        var prevSoldier = this.soldierPositionBiMap.putIfAbsent(position, soldier);
+        if (prevSoldier != null) {
+            return false;
+        }
+        return true;
     }
 
     public GameMapData toGameMapData() {
