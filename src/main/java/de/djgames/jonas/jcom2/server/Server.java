@@ -38,32 +38,15 @@ public class Server {
         this.connectedPlayers = new ArrayList<>();
 
         ScheduledThreadPoolExecutor heartBeatSender = new ScheduledThreadPoolExecutor(1);
-        heartBeatSender.scheduleAtFixedRate(() -> {
-//            try {
-//                this.connectedPlayers.removeIf(player ->
-//                        !player.getCommunicator().sendMessage(JComMessageFactory.createHeartbeatMessage(player.getId())));
-//            } catch (Throwable t) {
-//                logger.fatal(t.getLocalizedMessage(), t);
-//            }
-            Iterator<Player> iP = this.connectedPlayers.iterator();
-            while (iP.hasNext()) {
-                var player = iP.next();
-                var result =
-                        player.getCommunicator().sendMessage(JComMessageFactory.createHeartbeatMessage(player.getId()));
-                if (result) {
-                    iP.remove();
-                }
-            }
-        }, 0, 15, TimeUnit.SECONDS);
+        // heartBeatSender.scheduleAtFixedRate(heartBeatSender(), 0, 15, TimeUnit.SECONDS);
 
         ScheduledThreadPoolExecutor matchMaker = new ScheduledThreadPoolExecutor(1);
         matchMaker.scheduleAtFixedRate(() -> {
-            logger.debug("Im blue");
             var queueingPlayers =
                     this.connectedPlayers.stream().filter(player -> player.getStatus() == PlayerStatus.QUEUE)
                             .collect(Collectors.toList());
             //TODO to ensure, player 3 also gets matched at some point, maybe take queue time into account
-            Collections.shuffle(queueingPlayers);
+            Collections.shuffle(this.connectedPlayers);
             if (queueingPlayers.size() % 2 == 1) queueingPlayers.remove(queueingPlayers.size() - 1);
 
             List<List<Player>> soonToBeMatches = new ArrayList<>();
@@ -84,6 +67,17 @@ public class Server {
             }
 
         }, 0, 3, TimeUnit.SECONDS);
+    }
+
+    private Runnable heartBeatSender() {
+        return () -> {
+            try {
+                this.connectedPlayers.removeIf(player ->
+                        !player.getCommunicator().sendMessage(JComMessageFactory.createHeartbeatMessage(player.getId())));
+            } catch (Throwable t) {
+                logger.fatal(t.getLocalizedMessage(), t);
+            }
+        };
     }
 
     public static Server getInstance() {

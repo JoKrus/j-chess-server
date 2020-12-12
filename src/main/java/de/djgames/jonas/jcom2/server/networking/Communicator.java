@@ -21,6 +21,9 @@ public class Communicator {
     private JComInputStream fromPlayer;
     private JComOutputStream toPlayer;
 
+    private final Object lock = new Object();
+
+
     public Communicator(Socket socket) {
         try {
             this.fromPlayer = new JComInputStream(socket.getInputStream());
@@ -46,28 +49,32 @@ public class Communicator {
 
     //true success
     public boolean sendMessage(JComMessage message) {
-        try {
-            return this.toPlayer.write(message);
-        } catch (SocketException e) {
-            logger.info("Client is not reachable.");
-        } catch (IOException e) {
-            logger.error(e.getLocalizedMessage(), e);
+        synchronized (this.lock) {
+            try {
+                return this.toPlayer.write(message);
+            } catch (SocketException e) {
+                logger.info("Client is not reachable.");
+            } catch (IOException e) {
+                logger.error(e.getLocalizedMessage(), e);
+            }
+            return false;
         }
-        return false;
     }
 
     public void sendMessageOrRemove(JComMessage message) {
-        try {
-            if (!this.toPlayer.write(message)) {
+        synchronized (this.lock) {
+            try {
+                if (!this.toPlayer.write(message)) {
+                    logger.info("Client is not reachable.");
+                    Server.getInstance().removePlayer(this);
+                }
+            } catch (SocketException e) {
                 logger.info("Client is not reachable.");
                 Server.getInstance().removePlayer(this);
+            } catch (IOException e) {
+                logger.error(e.getLocalizedMessage(), e);
+                Server.getInstance().removePlayer(this);
             }
-        } catch (SocketException e) {
-            logger.info("Client is not reachable.");
-            Server.getInstance().removePlayer(this);
-        } catch (IOException e) {
-            logger.error(e.getLocalizedMessage(), e);
-            Server.getInstance().removePlayer(this);
         }
     }
 

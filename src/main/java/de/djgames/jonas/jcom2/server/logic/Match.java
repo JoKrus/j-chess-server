@@ -24,7 +24,7 @@ public class Match {
     public Match(List<Player> playerList, UUID matchId) {
         this.playerList = playerList;
         this.matchId = matchId;
-        randomStart = new Random();
+        this.randomStart = new Random();
     }
 
     public void startMatch() {
