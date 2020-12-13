@@ -3,6 +3,7 @@ package de.djgames.jonas.jcom2.server.logic;
 import de.djgames.jonas.jcom2.server.Server;
 import de.djgames.jonas.jcom2.server.factory.JComMessageFactory;
 import de.djgames.jonas.jcom2.server.generated.ErrorType;
+import de.djgames.jonas.jcom2.server.generated.JComMessageType;
 import de.djgames.jonas.jcom2.server.generated.PositionSoldiersMessage;
 import de.djgames.jonas.jcom2.server.generated.Team;
 import de.djgames.jonas.jcom2.server.logic.map.Coordinate;
@@ -25,6 +26,7 @@ public class Match {
     private final Random randomStart;
     private GameMap gameMap;
     private Player winner;
+    private WinningReason winningReason = WinningReason.UNDEFINED;
 
     public Match(List<Player> playerList, UUID matchId) {
         this.playerList = playerList;
@@ -95,9 +97,13 @@ public class Match {
             player.getCommunicator().sendMessageOrRemove(
                     JComMessageFactory.createBeginMessage(player.getId(), this.gameMap.toGameMapData(),
                             beginnerName, team));
-
-            var posSold = LogicHelpers.getMatchMessage(player, PositionSoldiersMessage.class);
-
+            //TODO better error type
+            var posSold = LogicHelpers.getMatchMessage(player, PositionSoldiersMessage.class, ErrorType.AWAIT_MOVE);
+            if (posSold == null) {
+                this.winner = this.playerList.get((i + 1) % 2);
+                this.winningReason = WinningReason.NO_VALID_MOVE_IN_TIME;
+                return;
+            }
             for (var posData : posSold.getPositions()) {
                 this.gameMap.spawnSoldier(team, new Coordinate(posData));
             }
@@ -107,13 +113,34 @@ public class Match {
     private void matchLoop() {
         logger.info("Match " + this.matchId + ": starts now.");
         boolean matchOngoing = true;
-        //TODO remove
+
+
+        //TODO replace with actual Game Loop
         int counter = 0;
         while (matchOngoing) {
-            for (var player : this.playerList) {
+            for (int i = 0; i < this.playerList.size(); i++) {
+                Player player = this.playerList.get(i);
+                //Await move
                 player.getCommunicator().sendMessage(JComMessageFactory.createAcceptMessage(player.getId(),
                         ErrorType.NO_ERROR));
-                var answer = player.getCommunicator().receiveMessage();
+
+                var receive = LogicHelpers.getMatchMessage(player,
+                        List.of(JComMessageType.ACCEPT), ErrorType.AWAIT_MOVE);
+                //Received no valid message, game ends
+                if (receive == null) {
+                    this.winner = this.playerList.get((i + 1) % 2);
+                    this.winningReason = WinningReason.NO_VALID_MOVE_IN_TIME;
+                    return;
+                }
+                switch (receive.getRight()) {
+                    case ACCEPT:
+                        var accept = receive.getLeft().getAccept();
+                        break;
+                    case POSITION_SOLDIERS:
+                        var posSol = receive.getLeft().getPositionSoldiers();
+                        break;
+                }
+
             }
             counter++;
             if (counter > 3) {
@@ -129,7 +156,8 @@ public class Match {
         for (var player : this.playerList) {
             player.setStatus(PlayerStatus.QUEUE);
             var msg = JComMessageFactory.createGameOverMessage(player.getId(),
-                    this.winner == null ? "" : this.winner.getPlayerName(), "");
+                    this.winner == null ? "" : this.winner.getPlayerName(),
+                    "winningReason:" + this.winningReason.name());
             player.getCommunicator().sendMessage(msg);
         }
         logger.info("Match " + this.matchId + ": is over.");
