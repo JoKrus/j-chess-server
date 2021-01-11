@@ -7,13 +7,13 @@ public class GameMapTest {
 
     @Test
     public void validChars() {
-        char[] expected = new char[]{'R', 'B', '-', 'H', 'C', 'P'};
+        char[] expected = new char[]{'R', 'B', '-', 'H', 'C', 'P', 'F'};
         Assertions.assertArrayEquals(expected, GameMap.validChars);
     }
 
     @Test
     public void regexMatcher() {
-        Assertions.assertEquals("[^\\QRB-HCP\\E]", GameMap.regexMatcher);
+        Assertions.assertEquals("[^\\QRB-HCPF\\E]", GameMap.regexMatcher);
     }
 
     @Test

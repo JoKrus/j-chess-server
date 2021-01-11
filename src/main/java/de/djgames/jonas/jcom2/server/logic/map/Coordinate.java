@@ -16,6 +16,13 @@ public class Coordinate {
         this(positionData.getPosX(), positionData.getPosY());
     }
 
+    public PositionData toPositionData() {
+        PositionData positionData = new PositionData();
+        positionData.setPosX(this.x);
+        positionData.setPosY(this.y);
+        return positionData;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

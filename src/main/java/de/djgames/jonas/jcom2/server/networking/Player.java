@@ -8,7 +8,7 @@ public class Player {
     private final Communicator communicator;
     private final String playerName;
     private PlayerStatus status;
-    //TODO role
+    //TODO role (Player / Spectator)
 
     public Player(UUID id, Communicator communicator, String playerName) {
         this.id = id;

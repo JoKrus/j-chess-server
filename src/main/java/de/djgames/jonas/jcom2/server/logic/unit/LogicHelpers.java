@@ -6,6 +6,7 @@ import de.djgames.jonas.jcom2.server.generated.*;
 import de.djgames.jonas.jcom2.server.networking.Player;
 import de.djgames.jonas.jcom2.server.settings.Settings;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -27,8 +28,16 @@ public class LogicHelpers {
         return unitData;
     }
 
-    public static <T> T getMatchMessage(Player player, Class<T> classToReturn, ErrorType ifWrongMessageComes) {
-        int errors = 0;
+    //TODO add validator as callback?
+
+    public static <T> Pair<T, Integer> getMatchMessage(Player player, Class<T> classToReturn,
+                                                       ErrorType ifWrongMessageTypeComes) {
+        return getMatchMessage(player, classToReturn, ifWrongMessageTypeComes, 0);
+    }
+
+    public static <T> Pair<T, Integer> getMatchMessage(Player player, Class<T> classToReturn,
+                                                       ErrorType ifWrongMessageTypeComes,
+                                                       int errors) {
         T ret;
         do {
             var receive = player.getCommunicator().receiveMessage();
@@ -36,10 +45,10 @@ public class LogicHelpers {
             errors++;
             if (ret == null) {
                 player.getCommunicator().sendMessage(JComMessageFactory.createAcceptMessage(player.getId(),
-                        ifWrongMessageComes));
+                        ifWrongMessageTypeComes));
             }
         } while (errors < Settings.getInt(Settings.MATCH_TRIES) && ret == null);
-        return ret;
+        return Pair.of(ret, errors);
     }
 
     private static final Method[] jcomMessageMethods = JComMessage.class.getDeclaredMethods();
@@ -56,11 +65,17 @@ public class LogicHelpers {
         return ret;
     }
 
-    public static Pair<JComMessage, JComMessageType> getMatchMessage(Player player,
-                                                                     List<JComMessageType> validTypesToReturn,
-                                                                     ErrorType ifWrongMessageComes) {
-        int errors = 0;
-        Pair ret = null;
+
+    public static Triple<JComMessage, JComMessageType, Integer> getMatchMessage(Player player,
+                                                                                List<JComMessageType> validTypesToReturn,
+                                                                                ErrorType ifWrongMessageTypeComes) {
+        return getMatchMessage(player, validTypesToReturn, ifWrongMessageTypeComes, 0);
+    }
+
+    public static Triple<JComMessage, JComMessageType, Integer> getMatchMessage(Player player,
+                                                                                List<JComMessageType> validTypesToReturn,
+                                                                                ErrorType ifWrongMessageTypeComes, int errors) {
+        Pair<JComMessage, JComMessageType> ret = null;
         var methodsThatFit = Arrays.stream(jcomMessageMethods)
                 .map(method -> Pair.of(method, method.getReturnType()))
                 .filter(methodPair -> {
@@ -84,22 +99,30 @@ public class LogicHelpers {
             errors++;
             if (ret == null) {
                 player.getCommunicator().sendMessage(JComMessageFactory.createAcceptMessage(player.getId(),
-                        ifWrongMessageComes));
+                        ifWrongMessageTypeComes));
             }
         } while (errors < Settings.getInt(Settings.MATCH_TRIES) && ret == null);
-        return ret;
+        if (ret == null) {
+            return Triple.of(null, null, errors);
+        } else {
+            return Triple.of(ret.getLeft(), ret.getRight(), errors);
+        }
     }
 
     public static final ImmutableBiMap<JComMessageType, Class> typeClassMap =
             new ImmutableBiMap.Builder<JComMessageType, Class>()
                     .put(JComMessageType.ACCEPT, AcceptMessage.class)
+                    .put(JComMessageType.ACTION, ActionMessage.class)
                     .put(JComMessageType.BEGIN, BeginMessage.class)
                     .put(JComMessageType.DISCONNECT, DisconnectMessage.class)
+                    .put(JComMessageType.FINISH_TURN, FinishTurnMessage.class)
                     .put(JComMessageType.GAME_FOUND, GameFoundMessage.class)
                     .put(JComMessageType.GAME_OVER, GameOverMessage.class)
+                    .put(JComMessageType.GAME_STATUS_PLAYER, GameStatusPlayerMessage.class)
                     .put(JComMessageType.HEART_BEAT, HeartBeatMessage.class)
                     .put(JComMessageType.LOGIN, LoginMessage.class)
                     .put(JComMessageType.LOGIN_REPLY, LoginReplyMessage.class)
                     .put(JComMessageType.POSITION_SOLDIERS, PositionSoldiersMessage.class)
+                    .put(JComMessageType.YOUR_TURN, YourTurnMessage.class)
                     .build();
 }

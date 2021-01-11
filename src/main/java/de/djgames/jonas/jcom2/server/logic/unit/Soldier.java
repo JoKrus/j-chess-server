@@ -8,6 +8,13 @@ public class Soldier extends UnitData {
 
     public Soldier(UnitData unitData, Team team) {
         super();
+        this.armor = unitData.getArmor();
+        this.healthPoints = unitData.getHealthPoints();
+        this.id = unitData.getId();
+        this.movementPoints = unitData.getMovementPoints();
+        this.name = unitData.getName();
+        this.primaryWeapon = unitData.getPrimaryWeapon();
+        this.visionDistance = unitData.getVisionDistance();
         this.team = team;
     }
 
