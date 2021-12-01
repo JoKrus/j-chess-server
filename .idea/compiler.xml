@@ -7,10 +7,12 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="JComServer2" />
+        <module name="j-chess-server" />
         <module name="JComServer" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="j-chess-server" target="11" />
       <module name="JComServer2" target="11" />
     </bytecodeTargetLevel>
   </component>

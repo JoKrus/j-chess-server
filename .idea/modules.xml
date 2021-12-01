@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/JComServer2.iml" filepath="$PROJECT_DIR$/.idea/JComServer2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/j-chess-server.iml" filepath="$PROJECT_DIR$/j-chess-server.iml" />
     </modules>
   </component>
 </project>

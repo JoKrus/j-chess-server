@@ -4,51 +4,25 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>de.djgames.jonas.jcom2.server</groupId>
-    <artifactId>j-com-server2</artifactId>
-    <version>0.5.0</version>
+    <groupId>net.jcom.jchess.server</groupId>
+    <artifactId>j-chess-server</artifactId>
+    <version>0.1.0</version>
 
-    <name>JComServer2</name>
-    <url>https://www.dj-games.de</url>
+    <name>JChessServer</name>
+    <url>https://chess.j-com.net</url>
 
     <properties>
         <java.version>11</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
-        <main.class>de.djgames.jonas.jcom2.server.StartServer</main.class>
+        <main.class>net.jcom.jchess.server.StartServer</main.class>
+        <xsd.sources.dir>src/main/resources/xsd/jChessMessage.xsd</xsd.sources.dir>
+        <generated.classes.dir>${project.build.sourceDirectory}</generated.classes.dir>
+        <generated.classes.package>${project.groupId}.generated</generated.classes.package>
     </properties>
 
-
-    <repositories>
-        <repository>
-            <id>github</id>
-            <name>JCom Xsd Java Implementation</name>
-            <url>https://maven.pkg.github.com/jokrus/JComJavaXsd</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
-
-    <distributionManagement>
-        <repository>
-            <id>github</id>
-            <name>GitHub Packages</name>
-            <url>https://maven.pkg.github.com/jokrus/JComServer2</url>
-        </repository>
-    </distributionManagement>
-
     <dependencies>
-        <dependency>
-            <groupId>de.djgames.jonas.jcom2.server</groupId>
-            <artifactId>j-com-xsd-java</artifactId>
-            <version>0.5.0</version>
-        </dependency>
-
         <!--
         Copyright (c) 2013, 2020 Oracle and/or its affiliates. All rights reserved.
 
@@ -61,7 +35,7 @@
         <dependency>
             <groupId>org.glassfish.jaxb</groupId>
             <artifactId>jaxb-runtime</artifactId>
-            <version>2.3.3</version>
+            <version>3.0.1</version>
             <scope>runtime</scope>
         </dependency>
 
@@ -69,20 +43,20 @@
         <dependency>
             <groupId>javax.xml.bind</groupId>
             <artifactId>jaxb-api</artifactId>
-            <version>2.3.1</version>
+            <version>2.4.0-b180830.0359</version>
         </dependency>
 
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <version>5.4.2</version>
+            <version>5.8.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <version>5.4.2</version>
+            <version>5.8.1</version>
             <scope>test</scope>
         </dependency>
 
@@ -110,7 +84,7 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.11</version>
+            <version>3.12.0</version>
         </dependency>
         <dependency>
             <groupId>commons-codec</groupId>
@@ -126,7 +100,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>30.0-jre</version>
+            <version>31.0.1-jre</version>
         </dependency>
     </dependencies>
 
@@ -200,6 +174,29 @@
                     </descriptorRefs>
                     <appendAssemblyId>true</appendAssemblyId>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-xjc-plugin</artifactId>
+                <version>3.3.0</version>
+                <executions>
+                    <execution>
+                        <id>xjc</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>xsdtojava</goal>
+                        </goals>
+                        <configuration>
+                            <sourceRoot>${generated.classes.dir}</sourceRoot>
+                            <xsdOptions>
+                                <xsdOption>
+                                    <xsd>${basedir}/${xsd.sources.dir}</xsd>
+                                    <packagename>${generated.classes.package}</packagename>
+                                </xsdOption>
+                            </xsdOptions>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
