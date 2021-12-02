@@ -12,8 +12,6 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static net.jcom.jchess.server.StartServer.logger;
-
 public class Position {
     private List<Piece> pieceList;
     private Color current;
@@ -32,7 +30,7 @@ public class Position {
 
     public Position(String fenString) {
         if (!isFENValidSyntax(fenString)) {
-            throw new IllegalArgumentException("FEN is not valid");
+            throw new IllegalArgumentException(String.format("FEN is not valid: %s", fenString));
         }
 
         this.pieceList = new ArrayList<>();
@@ -122,8 +120,8 @@ public class Position {
 
         var endLine = moving.getColor().equals(Color.WHITE) ? 0 : 7;
 
-        int yDistance = Math.abs(from.getY() - to.getY());
-        int xDistance = Math.abs(from.getX() - to.getX());
+        int yDistance = from.getY() - to.getY();
+        int xDistance = from.getX() - to.getX();
 
         handleRochade(from, to, moving, xDistance);
         handlePieceTakingAndHalfMoveClock(to, moving);
@@ -140,8 +138,21 @@ public class Position {
         }
     }
 
+    public List<MoveData> generateAllMoves(Color color) {
+        List<MoveData> ret = new ArrayList<>();
+        for (var piece : this.getPieceList(color)) {
+            ret.addAll(piece.possibleToMoveTo(this).stream().map(coordinate -> {
+                MoveData moveData = new MoveData();
+                moveData.setFrom(piece.getCoordinate().toString());
+                moveData.setTo(coordinate.toString());
+                return moveData;
+            }).collect(Collectors.toList()));
+        }
+        return ret;
+    }
+
     private void handleRochade(Coordinate from, Coordinate to, Piece moving, int xDistance) {
-        if (moving.getPieceType() == PieceType.KING && xDistance == 2) {
+        if (moving.getPieceType() == PieceType.KING && Math.abs(xDistance) == 2) {
             var rookMove = PieceHelper.getRochadeRook(this, from, to);
             rookMove.getLeft().setCoordinate(rookMove.getRight());
         }
@@ -172,8 +183,10 @@ public class Position {
         if (possTaken != null) {
             var takenPiece = possTaken;
             this.pieceList.remove(takenPiece);
+            /*
             logger.info(String.format("%s %s took %s %s", moving.getColor(), moving.getPieceType(),
                     takenPiece.getColor(), takenPiece.getPieceType()));
+            */
             //Reset if piece is taken
             this.halfMoveClock = 0;
         }
@@ -183,7 +196,7 @@ public class Position {
         if (moving.getPieceType() == PieceType.PAWN) {
             this.halfMoveClock = 0;
             if (yDistance == 2) {
-                int dir = Integer.signum(yDistance);
+                int dir = -Integer.signum(yDistance);
                 this.enPassant = Coordinate.of(from.getX(), from.getY() + dir);
 
             } else {
