@@ -1,5 +1,6 @@
 package net.jcom.jchess.server.logic.pieces;
 
+import net.jcom.jchess.server.generated.MoveData;
 import net.jcom.jchess.server.logic.Color;
 import net.jcom.jchess.server.logic.Coordinate;
 import net.jcom.jchess.server.logic.Position;
@@ -8,8 +9,9 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.util.List;
 
 public class PieceHelper {
-    public static void checkDir(Position position, List<Coordinate> ret, int x, int y, int xDir, int yDir,
+    public static void checkDir(Position position, List<MoveData> ret, int x, int y, int xDir, int yDir,
                                 Color myColor) {
+        Coordinate baseCoordinate = Coordinate.of(x, y);
         while (x >= 0 && y >= 0 && x <= 7 && y <= 7) {
             x += xDir;
             y += yDir;
@@ -19,9 +21,9 @@ public class PieceHelper {
             }
             Piece pieceAt = position.getPieceAt(coordinateAt);
             if (pieceAt == null) {
-                ret.add(coordinateAt);
+                ret.add(PieceHelper.coordinateToMoveData(baseCoordinate, coordinateAt));
             } else if (pieceAt.getColor() == myColor.enemy()) {
-                ret.add(coordinateAt);
+                ret.add(PieceHelper.coordinateToMoveData(baseCoordinate, coordinateAt));
                 break;
             } else {
                 break;
@@ -29,7 +31,7 @@ public class PieceHelper {
         }
     }
 
-    public static void checkDiagonals(Position position, List<Coordinate> ret, int x, int y, Color myColor) {
+    public static void checkDiagonals(Position position, List<MoveData> ret, int x, int y, Color myColor) {
         //up left
         PieceHelper.checkDir(position, ret, x, y, -1, -1, myColor);
 
@@ -43,7 +45,7 @@ public class PieceHelper {
         PieceHelper.checkDir(position, ret, x, y, 1, 1, myColor);
     }
 
-    public static void checkStraights(Position position, List<Coordinate> ret, int x, int y, Color myColor) {
+    public static void checkStraights(Position position, List<MoveData> ret, int x, int y, Color myColor) {
         //up
         PieceHelper.checkDir(position, ret, x, y, 0, -1, myColor);
 
@@ -84,5 +86,17 @@ public class PieceHelper {
     public static Pair<Piece, Coordinate> getRochadeRook(Position position, Coordinate from, Coordinate to) {
         return Pair.of(position.getPieceAt(Coordinate.of(to.getX() == 2 ? 0 : 7, to.getY())),
                 Coordinate.of(to.getX() == 2 ? 3 : 5, to.getY()));
+    }
+
+    public static MoveData coordinateToMoveData(Coordinate from, Coordinate to) {
+        return coordinateToMoveData(from, to, "q");
+    }
+
+    public static MoveData coordinateToMoveData(Coordinate from, Coordinate to, String promotion) {
+        MoveData ret = new MoveData();
+        ret.setFrom(from.toString());
+        ret.setTo(to.toString());
+        ret.setPromotionUnit(promotion);
+        return ret;
     }
 }

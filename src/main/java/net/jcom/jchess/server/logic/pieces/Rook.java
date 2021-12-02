@@ -1,5 +1,6 @@
 package net.jcom.jchess.server.logic.pieces;
 
+import net.jcom.jchess.server.generated.MoveData;
 import net.jcom.jchess.server.logic.Color;
 import net.jcom.jchess.server.logic.Coordinate;
 import net.jcom.jchess.server.logic.Position;
@@ -13,8 +14,8 @@ public class Rook extends Piece {
     }
 
     @Override
-    protected List<Coordinate> possibleToMoveToUnchecked(Position position) {
-        List<Coordinate> ret = new ArrayList<>();
+    protected List<MoveData> possibleToMoveToUnchecked(Position position) {
+        List<MoveData> ret = new ArrayList<>();
 
         int x = this.getCoordinate().getX(), y = this.getCoordinate().getY();
 

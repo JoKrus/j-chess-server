@@ -1,5 +1,6 @@
 package net.jcom.jchess.server.logic;
 
+import net.jcom.jchess.server.generated.MoveData;
 import net.jcom.jchess.server.logic.pieces.*;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -138,5 +139,9 @@ public class Parser {
         }
 
         return piece;
+    }
+
+    public static String moveDataToString(MoveData moveData) {
+        return moveData.getFrom() + moveData.getTo() + moveData.getPromotionUnit();
     }
 }

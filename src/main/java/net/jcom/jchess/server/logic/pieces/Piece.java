@@ -19,22 +19,20 @@ public abstract class Piece {
         this.pieceType = pieceType;
     }
 
-    protected abstract List<Coordinate> possibleToMoveToUnchecked(Position position);
+    protected abstract List<MoveData> possibleToMoveToUnchecked(Position position);
 
-    public List<Coordinate> possibleToMoveTo(Position position) {
-        List<Coordinate> uncheckedMoves = possibleToMoveToUnchecked(position);
+    public List<MoveData> possibleToMoveTo(Position position) {
+        List<MoveData> uncheckedMoves = possibleToMoveToUnchecked(position);
 
-        List<Coordinate> toRemove = new ArrayList<>();
+        List<MoveData> toRemove = new ArrayList<>();
 
         for (var move : uncheckedMoves) {
             Position fakePos = new Position(position);
 
-            MoveData moveData = new MoveData();
-            moveData.setFrom(Piece.this.coordinate.toString());
-            moveData.setTo(move.toString());
             //Promotion is not relevant here since it only needs to check if moving would result in a check
 
-            fakePos.playMove(moveData, true);
+            fakePos.playMove(move, true);
+
             if (fakePos.playerInCheck(this.getColor()).size() > 0) {
                 toRemove.add(move);
             }
@@ -44,7 +42,7 @@ public abstract class Piece {
         return uncheckedMoves;
     }
 
-    public List<Coordinate> possibleToMoveToUnchecked(Position position, boolean force) {
+    public List<MoveData> possibleToMoveToUnchecked(Position position, boolean force) {
         return possibleToMoveToUnchecked(position);
     }
 

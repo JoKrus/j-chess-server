@@ -28,7 +28,9 @@ public class MoveGenerationTest {
     @MethodSource(value = "moveGenTestData")
     void moveGenerationTest(Triple<String, Integer, Long> arguments) {
         Position position = new Position(arguments.getLeft());
+
         var res = moveGenTestRecursive(position, arguments.getMiddle());
+
 
         assertEquals(arguments.getRight(), res);
         //assertEquals(CollectionUtils.getCardinalityMap(arguments.getRight()), CollectionUtils.getCardinalityMap
@@ -44,7 +46,8 @@ public class MoveGenerationTest {
         for (var data : moveData) {
             Position newPosition = new Position(position);
             newPosition.playMove(data, true);
-            numPos += moveGenTestRecursive(newPosition, depth - 1);
+            // ret.add(data);
+            numPos += moveGenTestRecursive(newPosition, depth - 1 /*, ret*/);
         }
         return numPos;
     }

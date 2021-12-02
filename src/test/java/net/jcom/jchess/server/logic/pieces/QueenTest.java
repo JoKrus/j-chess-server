@@ -8,6 +8,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -31,6 +32,8 @@ public class QueenTest {
         Piece piece = position.getPieceAt(arguments.getLeft());
         var calculatedPositions = piece.possibleToMoveTo(position);
 
-        assertEquals(CollectionUtils.getCardinalityMap(arguments.getRight()), CollectionUtils.getCardinalityMap(calculatedPositions));
+        assertEquals(CollectionUtils.getCardinalityMap(arguments.getRight()),
+                CollectionUtils.getCardinalityMap(calculatedPositions.stream()
+                        .map(moveData -> Coordinate.parse(moveData.getTo())).collect(Collectors.toList())));
     }
 }

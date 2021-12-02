@@ -77,7 +77,9 @@ public class Position {
 
         List<Piece> piecesThatPutKingInCheck = new ArrayList<>();
         for (var piece : this.getPieceList(color.enemy())) {
-            if (piece.possibleToMoveToUnchecked(this, true).contains(kingToCheck.getCoordinate())) {
+            if (piece.possibleToMoveToUnchecked(this, true).stream()
+                    .map(moveData -> Coordinate.parse(moveData.getTo())).collect(Collectors.toList())
+                    .contains(kingToCheck.getCoordinate())) {
                 piecesThatPutKingInCheck.add(piece);
             }
         }
@@ -88,7 +90,8 @@ public class Position {
     public List<Piece> canMoveToSquare(Coordinate square, Color color) {
         List<Piece> ret = new ArrayList<>();
         for (var piece : this.getPieceList(color)) {
-            if (piece.possibleToMoveToUnchecked(this, true).contains(square)) {
+            if (piece.possibleToMoveToUnchecked(this, true).stream()
+                    .map(moveData -> Coordinate.parse(moveData.getTo())).collect(Collectors.toList()).contains(square)) {
                 ret.add(piece);
             }
         }
@@ -112,8 +115,8 @@ public class Position {
         }
 
         if (!force) {
-            List<Coordinate> possibleTos = moving.possibleToMoveTo(this);
-            if (!possibleTos.contains(to)) {
+            List<MoveData> possibleTos = moving.possibleToMoveTo(this);
+            if (!possibleTos.contains(moveData)) {
                 throw new IllegalArgumentException("Not a valid move");
             }
         }
@@ -141,12 +144,7 @@ public class Position {
     public List<MoveData> generateAllMoves(Color color) {
         List<MoveData> ret = new ArrayList<>();
         for (var piece : this.getPieceList(color)) {
-            ret.addAll(piece.possibleToMoveTo(this).stream().map(coordinate -> {
-                MoveData moveData = new MoveData();
-                moveData.setFrom(piece.getCoordinate().toString());
-                moveData.setTo(coordinate.toString());
-                return moveData;
-            }).collect(Collectors.toList()));
+            ret.addAll(piece.possibleToMoveTo(this));
         }
         return ret;
     }

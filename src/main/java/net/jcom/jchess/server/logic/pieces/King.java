@@ -1,5 +1,6 @@
 package net.jcom.jchess.server.logic.pieces;
 
+import net.jcom.jchess.server.generated.MoveData;
 import net.jcom.jchess.server.logic.Color;
 import net.jcom.jchess.server.logic.Coordinate;
 import net.jcom.jchess.server.logic.Position;
@@ -13,8 +14,8 @@ public class King extends Piece {
     }
 
     @Override
-    protected List<Coordinate> possibleToMoveToUnchecked(Position position) {
-        List<Coordinate> ret = new ArrayList<>();
+    protected List<MoveData> possibleToMoveToUnchecked(Position position) {
+        List<MoveData> ret = new ArrayList<>();
 
         int x = this.getCoordinate().getX(), y = this.getCoordinate().getY();
 
@@ -35,9 +36,9 @@ public class King extends Piece {
         return ret;
     }
 
-    private void checkForRochade(Position position, List<Coordinate> ret) {
+    private void checkForRochade(Position position, List<MoveData> ret) {
         //to only have to check for q and k and not distinguish between colors
-        var asciiStepsToLower = this.getColor().equals(Color.WHITE) ? 'a' - 'A' : 0;
+        var asciiStepsToLower = this.getColor().equals(Color.WHITE) ? 0 : 'a' - 'A';
         var baseLine = this.getColor().equals(Color.WHITE) ? 7 : 0;
 
         //Kingside
@@ -52,14 +53,14 @@ public class King extends Piece {
                 anyReachable.addAll(position.canMoveToSquare(Coordinate.of(6, baseLine), this.getColor().enemy()));
 
                 if (anyReachable.size() == 0) {
-                    ret.add(Coordinate.of(6, baseLine));
+                    ret.add(PieceHelper.coordinateToMoveData(this.getCoordinate(), Coordinate.of(6, baseLine)));
                 }
             }
         }
 
         //Queenside
 
-        if (position.getPossibleRochades().indexOf(asciiStepsToLower + 'Q') != 0) {
+        if (position.getPossibleRochades().indexOf(asciiStepsToLower + 'Q') >= 0) {
             //Rook and King have not moved
             if (position.getPieceAt(Coordinate.of(1, baseLine)) == null &&
                     position.getPieceAt(Coordinate.of(2, baseLine)) == null &&
@@ -71,20 +72,20 @@ public class King extends Piece {
                 anyReachable.addAll(position.canMoveToSquare(Coordinate.of(4, baseLine), this.getColor().enemy()));
 
                 if (anyReachable.size() == 0) {
-                    ret.add(Coordinate.of(2, baseLine));
+                    ret.add(PieceHelper.coordinateToMoveData(this.getCoordinate(), Coordinate.of(2, baseLine)));
                 }
             }
         }
     }
 
-    private void checkSquare(Position position, List<Coordinate> ret, int newX, int newY) {
+    private void checkSquare(Position position, List<MoveData> ret, int newX, int newY) {
         Coordinate coordinate = Coordinate.of(newX, newY);
         if (coordinate == null) {
             return;
         }
         Piece pieceAt = position.getPieceAt(coordinate);
         if (pieceAt == null || pieceAt.getColor() != getColor()) {
-            ret.add(coordinate);
+            ret.add(PieceHelper.coordinateToMoveData(this.getCoordinate(), coordinate));
         }
     }
 }

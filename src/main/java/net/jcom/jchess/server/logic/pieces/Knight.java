@@ -1,5 +1,6 @@
 package net.jcom.jchess.server.logic.pieces;
 
+import net.jcom.jchess.server.generated.MoveData;
 import net.jcom.jchess.server.logic.Color;
 import net.jcom.jchess.server.logic.Coordinate;
 import net.jcom.jchess.server.logic.Position;
@@ -13,8 +14,8 @@ public class Knight extends Piece {
     }
 
     @Override
-    protected List<Coordinate> possibleToMoveToUnchecked(Position position) {
-        List<Coordinate> ret = new ArrayList<>();
+    protected List<MoveData> possibleToMoveToUnchecked(Position position) {
+        List<MoveData> ret = new ArrayList<>();
 
         int x = this.getCoordinate().getX(), y = this.getCoordinate().getY();
         //up left
@@ -30,14 +31,14 @@ public class Knight extends Piece {
         return ret;
     }
 
-    private void checkSquare(Position position, List<Coordinate> ret, int newX, int newY) {
+    private void checkSquare(Position position, List<MoveData> ret, int newX, int newY) {
         Coordinate coordinate = Coordinate.of(newX, newY);
         if (coordinate == null) {
             return;
         }
         Piece pieceAt = position.getPieceAt(coordinate);
         if (pieceAt == null || pieceAt.getColor() != getColor()) {
-            ret.add(coordinate);
+            ret.add(PieceHelper.coordinateToMoveData(this.getCoordinate(), coordinate));
         }
     }
 }
