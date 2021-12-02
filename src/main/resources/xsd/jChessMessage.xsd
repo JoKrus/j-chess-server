@@ -15,6 +15,7 @@
             <xs:enumeration value="GameOver"/>
             <xs:enumeration value="AwaitMove"/>
             <xs:enumeration value="Move"/>
+            <!-- TODO add draw request -->
         </xs:restriction>
     </xs:simpleType>
 

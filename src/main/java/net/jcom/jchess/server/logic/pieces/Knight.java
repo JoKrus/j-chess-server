@@ -1,0 +1,17 @@
+package net.jcom.jchess.server.logic.pieces;
+
+import net.jcom.jchess.server.logic.Color;
+import net.jcom.jchess.server.logic.Coordinate;
+
+import java.util.List;
+
+public class Knight extends Piece {
+    public Knight(Coordinate coordinate, Color color) {
+        super(coordinate, color, PieceType.KNIGHT);
+    }
+
+    @Override
+    protected List<Coordinate> possibleToMoveToUnchecked() {
+        return null;
+    }
+}
