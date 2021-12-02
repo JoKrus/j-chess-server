@@ -1,5 +1,3 @@
-![Build](https://github.com/JoKrus/JComServer2/workflows/Build/badge.svg)
-![Publish Package](https://github.com/JoKrus/JComServer2/workflows/Publish%20Package/badge.svg)
+# j-chess-server
 
-# JComServer2
-Rewrite of JComServer with a different design
+Chess server implementation based heavily on JComServer architecture
