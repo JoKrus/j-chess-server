@@ -49,13 +49,13 @@ public class Position {
         this.round = Integer.parseInt(nextRound);
     }
 
-    public Position(Position copy) {
-
+    public Position(Position position) {
+        this(position.toFenNotation());
     }
 
-    //TODO
     public Piece getPieceAt(Coordinate coordinate) {
-        return null;
+        var optional = this.pieceList.stream().filter(piece -> piece.getCoordinate().equals(coordinate)).findFirst();
+        return optional.orElse(null);
     }
 
     public String toFenNotation() {
@@ -135,13 +135,13 @@ public class Position {
             ret.append("K");
         }
         if (this.possibleRochades.contains("Q")) {
-            ret.append("K");
+            ret.append("Q");
         }
         if (this.possibleRochades.contains("k")) {
-            ret.append("K");
+            ret.append("k");
         }
         if (this.possibleRochades.contains("q")) {
-            ret.append("K");
+            ret.append("q");
         }
         if (ret.length() == 0) {
             ret.append("-");
