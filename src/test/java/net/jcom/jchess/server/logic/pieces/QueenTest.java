@@ -19,9 +19,8 @@ public class QueenTest {
                         List.of()),
                 Triple.of(Coordinate.of(3, 7), "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
                         List.of()),
-                Triple.of(Coordinate.of(3, 0), "rnbqkbnr/pp2pppp/8/2pp4/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
-                        List.of(Coordinate.parse("c7"), Coordinate.parse("b6"), Coordinate.parse("a5"),
-                                Coordinate.parse("d7"), Coordinate.parse("d6")))
+                Triple.of(Coordinate.of(3, 0), "rnbqkbnr/pp2pppp/1P7/2pp4/8/8/P1PPPPPP/RNBQKBNR w KQkq - 0 1",
+                        List.of(Coordinate.parse("c7"), Coordinate.parse("b6"), Coordinate.parse("d7"), Coordinate.parse("d6")))
         );
     }
 
