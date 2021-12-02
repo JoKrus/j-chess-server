@@ -17,6 +17,7 @@ public abstract class Piece {
         this.pieceType = pieceType;
     }
 
+    //TODO filter if position results in check
     protected abstract List<Coordinate> possibleToMoveToUnchecked(Position position);
 
     public Coordinate getCoordinate() {

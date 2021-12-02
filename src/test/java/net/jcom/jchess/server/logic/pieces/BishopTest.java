@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class BishopTest {
 
@@ -28,11 +28,11 @@ public class BishopTest {
 
     @ParameterizedTest
     @MethodSource(value = "uncheckedMoveTestData")
-    void parseTest(Triple<Coordinate, String, List<Coordinate>> arguments) {
+    void uncheckedMoveGenerationTest(Triple<Coordinate, String, List<Coordinate>> arguments) {
         Position position = new Position(arguments.getMiddle());
         Piece piece = position.getPieceAt(arguments.getLeft());
         var calculatedPositions = piece.possibleToMoveToUnchecked(position);
 
-        assertTrue(CollectionUtils.isEqualCollection(arguments.getRight(), calculatedPositions));
+        assertEquals(CollectionUtils.getCardinalityMap(arguments.getRight()), CollectionUtils.getCardinalityMap(calculatedPositions));
     }
 }
