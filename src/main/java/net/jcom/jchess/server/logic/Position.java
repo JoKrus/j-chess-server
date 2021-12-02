@@ -98,6 +98,30 @@ public class Position {
         return ret.toString();
     }
 
+    public List<Piece> getPieceList() {
+        return this.pieceList;
+    }
+
+    public Color getCurrent() {
+        return this.current;
+    }
+
+    public Coordinate getEnPassant() {
+        return this.enPassant;
+    }
+
+    public int getHalfMoveClock() {
+        return this.halfMoveClock;
+    }
+
+    public int getRound() {
+        return this.round;
+    }
+
+    public String getPossibleRochades() {
+        return this.possibleRochades;
+    }
+
     public static boolean isFENValidSyntax(String fenString) {
         Pattern compile = Pattern.compile("\\s*([rnbqkpRNBQKP1-8]+/){7}([rnbqkpRNBQKP1-8]+)\\s[bw-]\\s(([kqKQ]{1,4})|(-))\\s(" +
                 "([a-h][36])|(-))\\s\\d+\\s\\d+\\s*");
