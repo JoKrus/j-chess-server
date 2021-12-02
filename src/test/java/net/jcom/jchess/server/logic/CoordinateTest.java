@@ -23,7 +23,7 @@ public class CoordinateTest {
     @ParameterizedTest
     @MethodSource(value = "data")
     void parseTest(Triple<Integer, Integer, String> arguments) {
-        Coordinate correct = new Coordinate(arguments.getLeft(), arguments.getMiddle());
+        Coordinate correct = Coordinate.of(arguments.getLeft(), arguments.getMiddle());
         Coordinate test = Coordinate.parse(arguments.getRight());
         assertEquals(correct, test);
     }
@@ -32,7 +32,7 @@ public class CoordinateTest {
     @MethodSource(value = "data")
     void toStringTest(Triple<Integer, Integer, String> arguments) {
         String correct = arguments.getRight();
-        String test = new Coordinate(arguments.getLeft(), arguments.getMiddle()).toString();
+        String test = Coordinate.of(arguments.getLeft(), arguments.getMiddle()).toString();
         assertEquals(correct, test);
     }
 }

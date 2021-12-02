@@ -64,7 +64,7 @@ public class Position {
         for (int row = 0; row < 8; row++) {
             int emptySquares = 0;
             for (int col = 0; col < 8; col++) {
-                Piece piece = getPieceAt(new Coordinate(col, row));
+                Piece piece = getPieceAt(Coordinate.of(col, row));
                 if (piece == null) {
                     emptySquares++;
                 } else {
@@ -121,7 +121,7 @@ public class Position {
                 if (atPosition == null) {
                     currX += Integer.parseInt(tokenCol);
                 } else {
-                    this.pieceList.add(Parser.getPiece(atPosition, new Coordinate(currX, currY)));
+                    this.pieceList.add(Parser.getPiece(atPosition, Coordinate.of(currX, currY)));
                     ++currX;
                 }
             }

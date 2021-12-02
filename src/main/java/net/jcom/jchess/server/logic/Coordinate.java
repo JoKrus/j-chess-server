@@ -13,14 +13,9 @@ public class Coordinate {
     //0/7 = a1
     //7/7 = h1
 
-    public Coordinate(int x, int y) {
+    private Coordinate(int x, int y) {
         this.x = x;
         this.y = y;
-    }
-
-    public Coordinate() {
-        this.x = -1;
-        this.y = -1;
     }
 
     public static Coordinate parse(String s) {
@@ -30,8 +25,15 @@ public class Coordinate {
             int possX = s.charAt(0) - 'a';
             int possY = '8' - s.charAt(1);
 
-            return new Coordinate(possX, possY);
+            return Coordinate.of(possX, possY);
         }
+    }
+
+    public static Coordinate of(int x, int y) {
+        if (x < 0 || x > 7 || y < 0 || y > 7) {
+            return null;
+        }
+        return new Coordinate(x, y);
     }
 
     public int getX() {

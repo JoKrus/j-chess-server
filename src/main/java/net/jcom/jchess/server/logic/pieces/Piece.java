@@ -2,6 +2,7 @@ package net.jcom.jchess.server.logic.pieces;
 
 import net.jcom.jchess.server.logic.Color;
 import net.jcom.jchess.server.logic.Coordinate;
+import net.jcom.jchess.server.logic.Position;
 
 import java.util.List;
 
@@ -16,7 +17,7 @@ public abstract class Piece {
         this.pieceType = pieceType;
     }
 
-    protected abstract List<Coordinate> possibleToMoveToUnchecked();
+    protected abstract List<Coordinate> possibleToMoveToUnchecked(Position position);
 
     public Coordinate getCoordinate() {
         return this.coordinate;
