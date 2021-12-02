@@ -13,16 +13,15 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class KingTest {
-
+public class RookTest {
     public static Stream<Triple<Coordinate, String, List<Coordinate>>> uncheckedMoveTestData() {
         return Stream.of(
-                Triple.of(Coordinate.of(4, 7), "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+                Triple.of(Coordinate.of(0, 7), "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
                         new ArrayList<>()),
-                Triple.of(Coordinate.of(4, 0), "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+                Triple.of(Coordinate.of(0, 0), "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
                         new ArrayList<>()),
-                Triple.of(Coordinate.of(4, 0), "rnbqkbnr/pppp1ppp/4p3/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
-                        List.of(Coordinate.of(4, 1)))
+                Triple.of(Coordinate.of(7, 0), "rnbqkbnr/ppppppp1/8/7p/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+                        List.of(Coordinate.of(7, 1), Coordinate.of(7, 2)))
         );
     }
 
@@ -36,3 +35,4 @@ public class KingTest {
         assertTrue(CollectionUtils.isEqualCollection(arguments.getRight(), calculatedPositions));
     }
 }
+

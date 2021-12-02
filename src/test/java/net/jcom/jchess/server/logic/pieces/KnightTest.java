@@ -7,22 +7,18 @@ import org.apache.commons.lang3.tuple.Triple;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class KingTest {
-
+public class KnightTest {
     public static Stream<Triple<Coordinate, String, List<Coordinate>>> uncheckedMoveTestData() {
         return Stream.of(
-                Triple.of(Coordinate.of(4, 7), "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
-                        new ArrayList<>()),
-                Triple.of(Coordinate.of(4, 0), "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
-                        new ArrayList<>()),
-                Triple.of(Coordinate.of(4, 0), "rnbqkbnr/pppp1ppp/4p3/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
-                        List.of(Coordinate.of(4, 1)))
+                Triple.of(Coordinate.of(6, 7), "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+                        List.of(Coordinate.of(5, 5), Coordinate.of(7, 5))),
+                Triple.of(Coordinate.of(6, 0), "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+                        List.of(Coordinate.of(5, 2), Coordinate.of(7, 2)))
         );
     }
 

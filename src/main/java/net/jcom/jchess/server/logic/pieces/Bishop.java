@@ -18,34 +18,17 @@ public class Bishop extends Piece {
 
         int x = this.getCoordinate().getX(), y = this.getCoordinate().getY();
         //up left
-        checkDir(position, ret, x, y, -1, -1);
+        PieceHelper.checkDir(position, ret, x, y, -1, -1, this.getColor());
 
         //up right
-        checkDir(position, ret, x, y, 1, -1);
+        PieceHelper.checkDir(position, ret, x, y, 1, -1, this.getColor());
 
         //down left
-        checkDir(position, ret, x, y, -1, 1);
+        PieceHelper.checkDir(position, ret, x, y, -1, 1, this.getColor());
 
         //down right
-        checkDir(position, ret, x, y, 1, 1);
+        PieceHelper.checkDir(position, ret, x, y, 1, 1, this.getColor());
 
         return ret;
-    }
-
-    private void checkDir(Position position, List<Coordinate> ret, int x, int y, int xDir, int yDir) {
-        while (x > 0 && y > 0 && x < 7 && y < 7) {
-            x += xDir;
-            y += yDir;
-            Coordinate coordinateAt = Coordinate.of(x, y);
-            Piece pieceAt = position.getPieceAt(coordinateAt);
-            if (pieceAt == null) {
-                ret.add(coordinateAt);
-            } else if (pieceAt.getColor() != this.getColor()) {
-                ret.add(coordinateAt);
-                break;
-            } else {
-                break;
-            }
-        }
     }
 }

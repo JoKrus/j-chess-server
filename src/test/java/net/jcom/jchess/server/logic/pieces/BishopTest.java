@@ -20,7 +20,9 @@ public class BishopTest {
                 Triple.of(Coordinate.of(2, 7), "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
                         new ArrayList<>()),
                 Triple.of(Coordinate.of(2, 0), "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
-                        new ArrayList<>())
+                        new ArrayList<>()),
+                Triple.of(Coordinate.of(2, 0), "rnbqkbnr/p1pppppp/1p6/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+                        List.of(Coordinate.of(1, 1), Coordinate.of(0, 2)))
         );
     }
 
