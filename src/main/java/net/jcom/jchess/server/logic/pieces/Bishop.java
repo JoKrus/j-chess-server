@@ -17,17 +17,8 @@ public class Bishop extends Piece {
         List<Coordinate> ret = new ArrayList<>();
 
         int x = this.getCoordinate().getX(), y = this.getCoordinate().getY();
-        //up left
-        PieceHelper.checkDir(position, ret, x, y, -1, -1, this.getColor());
 
-        //up right
-        PieceHelper.checkDir(position, ret, x, y, 1, -1, this.getColor());
-
-        //down left
-        PieceHelper.checkDir(position, ret, x, y, -1, 1, this.getColor());
-
-        //down right
-        PieceHelper.checkDir(position, ret, x, y, 1, 1, this.getColor());
+        PieceHelper.checkDiagonals(position, ret, x, y, this.getColor());
 
         return ret;
     }

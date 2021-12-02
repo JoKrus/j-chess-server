@@ -27,4 +27,32 @@ public class PieceHelper {
             }
         }
     }
+
+    public static void checkDiagonals(Position position, List<Coordinate> ret, int x, int y, Color myColor) {
+        //up left
+        PieceHelper.checkDir(position, ret, x, y, -1, -1, myColor);
+
+        //up right
+        PieceHelper.checkDir(position, ret, x, y, 1, -1, myColor);
+
+        //down left
+        PieceHelper.checkDir(position, ret, x, y, -1, 1, myColor);
+
+        //down right
+        PieceHelper.checkDir(position, ret, x, y, 1, 1, myColor);
+    }
+
+    public static void checkStraights(Position position, List<Coordinate> ret, int x, int y, Color myColor) {
+        //up
+        PieceHelper.checkDir(position, ret, x, y, 0, -1, myColor);
+
+        //right
+        PieceHelper.checkDir(position, ret, x, y, 1, 0, myColor);
+
+        //down
+        PieceHelper.checkDir(position, ret, x, y, 0, 1, myColor);
+
+        //left
+        PieceHelper.checkDir(position, ret, x, y, -1, 0, myColor);
+    }
 }
