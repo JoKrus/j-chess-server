@@ -17,7 +17,7 @@ public class Pawn extends Piece {
         List<Coordinate> ret = new ArrayList<>();
 
         int x = this.getCoordinate().getX(), y = this.getCoordinate().getY();
-        //TODO Push, Pushx2, Take, EnPassant
+
         int yDir = this.getColor().equals(Color.WHITE) ? -1 : 1;
         int baseLine = this.getColor().equals(Color.WHITE) ? 6 : 1;
 
