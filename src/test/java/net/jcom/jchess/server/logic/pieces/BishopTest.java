@@ -19,9 +19,9 @@ public class BishopTest {
         return Stream.of(
                 Triple.of(Coordinate.of(2, 7), "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
                         new ArrayList<>()),
-                Triple.of(Coordinate.of(2, 0), "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+                Triple.of(Coordinate.of(2, 0), "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1",
                         new ArrayList<>()),
-                Triple.of(Coordinate.of(2, 0), "rnbqkbnr/p1pppppp/1p6/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+                Triple.of(Coordinate.of(2, 0), "rnbqkbnr/p1pppppp/1p6/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1",
                         List.of(Coordinate.of(1, 1), Coordinate.of(0, 2)))
         );
     }
@@ -31,7 +31,7 @@ public class BishopTest {
     void uncheckedMoveGenerationTest(Triple<Coordinate, String, List<Coordinate>> arguments) {
         Position position = new Position(arguments.getMiddle());
         Piece piece = position.getPieceAt(arguments.getLeft());
-        var calculatedPositions = piece.possibleToMoveToUnchecked(position);
+        var calculatedPositions = piece.possibleToMoveTo(position);
 
         assertEquals(CollectionUtils.getCardinalityMap(arguments.getRight()), CollectionUtils.getCardinalityMap(calculatedPositions));
     }

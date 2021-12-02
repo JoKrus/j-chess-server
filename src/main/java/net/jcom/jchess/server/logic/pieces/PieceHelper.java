@@ -3,6 +3,7 @@ package net.jcom.jchess.server.logic.pieces;
 import net.jcom.jchess.server.logic.Color;
 import net.jcom.jchess.server.logic.Coordinate;
 import net.jcom.jchess.server.logic.Position;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.List;
 
@@ -19,7 +20,7 @@ public class PieceHelper {
             Piece pieceAt = position.getPieceAt(coordinateAt);
             if (pieceAt == null) {
                 ret.add(coordinateAt);
-            } else if (pieceAt.getColor() != myColor) {
+            } else if (pieceAt.getColor() == myColor.enemy()) {
                 ret.add(coordinateAt);
                 break;
             } else {
@@ -54,5 +55,34 @@ public class PieceHelper {
 
         //left
         PieceHelper.checkDir(position, ret, x, y, -1, 0, myColor);
+    }
+
+    public static String modifyRochadeString(String prevRochadeString, Coordinate from) {
+        String ret = prevRochadeString;
+
+        if (from.equals(Coordinate.parse("a1"))) {
+            ret = ret.replace("Q", "");
+        } else if (from.equals(Coordinate.parse("a8"))) {
+            ret = ret.replace("q", "");
+        } else if (from.equals(Coordinate.parse("h1"))) {
+            ret = ret.replace("K", "");
+        } else if (from.equals(Coordinate.parse("h1"))) {
+            ret = ret.replace("k", "");
+        } else if (from.equals(Coordinate.parse("e1"))) {
+            ret = ret.replace("Q", "").replace("K", "");
+        } else if (from.equals(Coordinate.parse("e8"))) {
+            ret = ret.replace("q", "").replace("k", "");
+        }
+
+        if (ret.isEmpty()) {
+            ret = "-";
+        }
+
+        return ret;
+    }
+
+    public static Pair<Piece, Coordinate> getRochadeRook(Position position, Coordinate from, Coordinate to) {
+        return Pair.of(position.getPieceAt(Coordinate.of(to.getX() == 2 ? 0 : 7, to.getY())),
+                Coordinate.of(to.getX() == 2 ? 3 : 5, to.getY()));
     }
 }

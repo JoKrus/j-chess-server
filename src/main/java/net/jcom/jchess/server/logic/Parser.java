@@ -111,4 +111,32 @@ public class Parser {
         }
         return piece;
     }
+
+    public static Piece parsePromotionUnit(String promotionString, Color color) {
+        Piece piece;
+
+        if (promotionString == null) {
+            promotionString = "";
+        }
+
+        promotionString = promotionString.toLowerCase();
+
+        switch (promotionString) {
+            case "n":
+                piece = new Knight(null, color);
+                break;
+            case "b":
+                piece = new Bishop(null, color);
+                break;
+            case "r":
+                piece = new Rook(null, color);
+                break;
+            case "q":
+            default:
+                piece = new Queen(null, color);
+                break;
+        }
+
+        return piece;
+    }
 }

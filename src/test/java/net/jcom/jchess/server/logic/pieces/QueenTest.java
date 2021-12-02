@@ -15,11 +15,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class QueenTest {
     public static Stream<Triple<Coordinate, String, List<Coordinate>>> uncheckedMoveTestData() {
         return Stream.of(
-                Triple.of(Coordinate.of(3, 0), "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+                Triple.of(Coordinate.of(3, 0), "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1",
                         List.of()),
                 Triple.of(Coordinate.of(3, 7), "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
                         List.of()),
-                Triple.of(Coordinate.of(3, 0), "rnbqkbnr/pp2pppp/1P7/2pp4/8/8/P1PPPPPP/RNBQKBNR w KQkq - 0 1",
+                Triple.of(Coordinate.of(3, 0), "rnbqkbnr/pp2pppp/1P6/2pp4/8/8/P1PPPPPP/RNBQKBNR b KQkq - 0 5",
                         List.of(Coordinate.parse("c7"), Coordinate.parse("b6"), Coordinate.parse("d7"), Coordinate.parse("d6")))
         );
     }
@@ -29,7 +29,7 @@ public class QueenTest {
     void uncheckedMoveGenerationTest(Triple<Coordinate, String, List<Coordinate>> arguments) {
         Position position = new Position(arguments.getMiddle());
         Piece piece = position.getPieceAt(arguments.getLeft());
-        var calculatedPositions = piece.possibleToMoveToUnchecked(position);
+        var calculatedPositions = piece.possibleToMoveTo(position);
 
         assertEquals(CollectionUtils.getCardinalityMap(arguments.getRight()), CollectionUtils.getCardinalityMap(calculatedPositions));
     }

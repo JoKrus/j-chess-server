@@ -27,8 +27,15 @@ public class King extends Piece {
         checkSquare(position, ret, x, y + 1);
         checkSquare(position, ret, x + 1, y + 1);
 
-        //add rochade
+        //add rochade only if my turn
+        if (position.getCurrent() == this.getColor()) {
+            checkForRochade(position, ret);
+        }
 
+        return ret;
+    }
+
+    private void checkForRochade(Position position, List<Coordinate> ret) {
         //to only have to check for q and k and not distinguish between colors
         var asciiStepsToLower = this.getColor().equals(Color.WHITE) ? 'a' - 'A' : 0;
         var baseLine = this.getColor().equals(Color.WHITE) ? 7 : 0;
@@ -39,8 +46,14 @@ public class King extends Piece {
             //Rook and King have not moved
             if (position.getPieceAt(Coordinate.of(5, baseLine)) == null && position.getPieceAt(Coordinate.of(6, baseLine)) == null) {
                 //no pieces between rook and king
-                //TODO check if no square is under attack/check
-                ret.add(Coordinate.of(6, baseLine));
+                List<Piece> anyReachable = new ArrayList<>();
+                anyReachable.addAll(position.canMoveToSquare(Coordinate.of(4, baseLine), this.getColor().enemy()));
+                anyReachable.addAll(position.canMoveToSquare(Coordinate.of(5, baseLine), this.getColor().enemy()));
+                anyReachable.addAll(position.canMoveToSquare(Coordinate.of(6, baseLine), this.getColor().enemy()));
+
+                if (anyReachable.size() == 0) {
+                    ret.add(Coordinate.of(6, baseLine));
+                }
             }
         }
 
@@ -52,12 +65,16 @@ public class King extends Piece {
                     position.getPieceAt(Coordinate.of(2, baseLine)) == null &&
                     position.getPieceAt(Coordinate.of(3, baseLine)) == null) {
                 //no pieces between rook and king
-                //TODO check if no square is under attack/check
-                ret.add(Coordinate.of(2, baseLine));
+                List<Piece> anyReachable = new ArrayList<>();
+                anyReachable.addAll(position.canMoveToSquare(Coordinate.of(2, baseLine), this.getColor().enemy()));
+                anyReachable.addAll(position.canMoveToSquare(Coordinate.of(3, baseLine), this.getColor().enemy()));
+                anyReachable.addAll(position.canMoveToSquare(Coordinate.of(4, baseLine), this.getColor().enemy()));
+
+                if (anyReachable.size() == 0) {
+                    ret.add(Coordinate.of(2, baseLine));
+                }
             }
         }
-
-        return ret;
     }
 
     private void checkSquare(Position position, List<Coordinate> ret, int newX, int newY) {

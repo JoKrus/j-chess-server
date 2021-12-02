@@ -18,9 +18,9 @@ public class RookTest {
         return Stream.of(
                 Triple.of(Coordinate.of(0, 7), "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
                         new ArrayList<>()),
-                Triple.of(Coordinate.of(0, 0), "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+                Triple.of(Coordinate.of(0, 0), "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1",
                         new ArrayList<>()),
-                Triple.of(Coordinate.of(7, 0), "rnbqkbnr/ppppppp1/8/7p/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+                Triple.of(Coordinate.of(7, 0), "rnbqkbnr/ppppppp1/8/7p/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1",
                         List.of(Coordinate.of(7, 1), Coordinate.of(7, 2)))
         );
     }
@@ -30,7 +30,7 @@ public class RookTest {
     void uncheckedMoveGenerationTest(Triple<Coordinate, String, List<Coordinate>> arguments) {
         Position position = new Position(arguments.getMiddle());
         Piece piece = position.getPieceAt(arguments.getLeft());
-        var calculatedPositions = piece.possibleToMoveToUnchecked(position);
+        var calculatedPositions = piece.possibleToMoveTo(position);
 
         assertEquals(CollectionUtils.getCardinalityMap(arguments.getRight()), CollectionUtils.getCardinalityMap(calculatedPositions));
     }

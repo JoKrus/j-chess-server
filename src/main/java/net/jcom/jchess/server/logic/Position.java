@@ -1,12 +1,18 @@
 package net.jcom.jchess.server.logic;
 
+import net.jcom.jchess.server.generated.MoveData;
+import net.jcom.jchess.server.logic.pieces.King;
 import net.jcom.jchess.server.logic.pieces.Piece;
+import net.jcom.jchess.server.logic.pieces.PieceHelper;
 import net.jcom.jchess.server.logic.pieces.PieceType;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import static net.jcom.jchess.server.StartServer.logger;
 
 public class Position {
     private List<Piece> pieceList;
@@ -58,6 +64,136 @@ public class Position {
         return optional.orElse(null);
     }
 
+    public List<Piece> playerInCheck(Color color) {
+        King kingToCheck = null;
+        for (var piece : this.getPieceList(color)) {
+            if (piece.getPieceType() == PieceType.KING && piece.getColor().equals(color)) {
+                kingToCheck = (King) piece;
+                break;
+            }
+        }
+
+        if (kingToCheck == null) {
+            throw new IllegalStateException("No King on the board");
+        }
+
+        List<Piece> piecesThatPutKingInCheck = new ArrayList<>();
+        for (var piece : this.getPieceList(color.enemy())) {
+            if (piece.possibleToMoveToUnchecked(this, true).contains(kingToCheck.getCoordinate())) {
+                piecesThatPutKingInCheck.add(piece);
+            }
+        }
+
+        return piecesThatPutKingInCheck;
+    }
+
+    public List<Piece> canMoveToSquare(Coordinate square, Color color) {
+        List<Piece> ret = new ArrayList<>();
+        for (var piece : this.getPieceList(color)) {
+            if (piece.possibleToMoveToUnchecked(this, true).contains(square)) {
+                ret.add(piece);
+            }
+        }
+        return ret;
+    }
+
+    public void playMove(MoveData moveData) {
+        playMove(moveData, false);
+    }
+
+    public void playMove(MoveData moveData, boolean force) {
+        Coordinate from = Coordinate.parse(moveData.getFrom());
+        Coordinate to = Coordinate.parse(moveData.getTo());
+        if (from == null || to == null) {
+            throw new IllegalArgumentException("Out of bounds");
+        }
+
+        Piece moving = getPieceAt(from);
+        if (moving == null || moving.getColor() != this.getCurrent()) {
+            throw new IllegalArgumentException("No valid piece at position");
+        }
+
+        if (!force) {
+            List<Coordinate> possibleTos = moving.possibleToMoveTo(this);
+            if (!possibleTos.contains(to)) {
+                throw new IllegalArgumentException("Not a valid move");
+            }
+        }
+
+        var endLine = moving.getColor().equals(Color.WHITE) ? 0 : 7;
+
+        int yDistance = Math.abs(from.getY() - to.getY());
+        int xDistance = Math.abs(from.getX() - to.getX());
+
+        handleRochade(from, to, moving, xDistance);
+        handlePieceTakingAndHalfMoveClock(to, moving);
+        handleSettingEnPassant(from, moving, yDistance);
+        handleSettingRochadeString(from);
+
+        moving.setCoordinate(to);
+
+        handlePromotion(moveData, to, moving, endLine);
+
+        this.current = this.current.enemy();
+        if (this.current == Color.WHITE) {
+            this.round++;
+        }
+    }
+
+    private void handleRochade(Coordinate from, Coordinate to, Piece moving, int xDistance) {
+        if (moving.getPieceType() == PieceType.KING && xDistance == 2) {
+            var rookMove = PieceHelper.getRochadeRook(this, from, to);
+            rookMove.getLeft().setCoordinate(rookMove.getRight());
+        }
+    }
+
+    private void handlePromotion(MoveData moveData, Coordinate to, Piece moving, int endLine) {
+        //Promotion
+        if (moving.getPieceType().equals(PieceType.PAWN) && to.getY() == endLine) {
+            var newPiece = Parser.parsePromotionUnit(moveData.getPromotionUnit(), moving.getColor());
+            newPiece.setCoordinate(to);
+            this.pieceList.remove(moving);
+            this.pieceList.add(newPiece);
+        }
+    }
+
+    private void handleSettingRochadeString(Coordinate from) {
+        this.possibleRochades = PieceHelper.modifyRochadeString(this.possibleRochades, from);
+    }
+
+    private void handlePieceTakingAndHalfMoveClock(Coordinate to, Piece moving) {
+        if (moving.getPieceType() != PieceType.PAWN) {
+            this.halfMoveClock++;
+        } else {
+            this.halfMoveClock = 0;
+        }
+
+        var possTaken = this.getPieceAt(to);
+        if (possTaken != null) {
+            var takenPiece = possTaken;
+            this.pieceList.remove(takenPiece);
+            logger.info(String.format("%s %s took %s %s", moving.getColor(), moving.getPieceType(),
+                    takenPiece.getColor(), takenPiece.getPieceType()));
+            //Reset if piece is taken
+            this.halfMoveClock = 0;
+        }
+    }
+
+    private void handleSettingEnPassant(Coordinate from, Piece moving, int yDistance) {
+        if (moving.getPieceType() == PieceType.PAWN) {
+            this.halfMoveClock = 0;
+            if (yDistance == 2) {
+                int dir = Integer.signum(yDistance);
+                this.enPassant = Coordinate.of(from.getX(), from.getY() + dir);
+
+            } else {
+                this.enPassant = null;
+            }
+        } else {
+            this.enPassant = null;
+        }
+    }
+
     public String toFenNotation() {
         StringBuilder ret = new StringBuilder();
 
@@ -100,6 +236,10 @@ public class Position {
 
     public List<Piece> getPieceList() {
         return this.pieceList;
+    }
+
+    public List<Piece> getPieceList(Color color) {
+        return this.pieceList.stream().filter(piece -> piece.getColor() == color).collect(Collectors.toList());
     }
 
     public Color getCurrent() {
@@ -171,5 +311,25 @@ public class Position {
             ret.append("-");
         }
         return ret.toString();
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder();
+
+        for (int y = 0; y < 8; y++) {
+            s.append("|");
+            for (int x = 0; x < 8; x++) {
+                if (this.getPieceAt(Coordinate.of(x, y)) != null) {
+                    s.append(Parser.parsePiece(this.getPieceAt(Coordinate.of(x, y))));
+                } else {
+                    s.append(" ");
+                }
+                s.append("|");
+            }
+            s.append("\n");
+        }
+
+        return s.toString();
     }
 }
