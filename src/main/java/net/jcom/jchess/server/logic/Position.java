@@ -129,7 +129,7 @@ public class Position {
         handleRochade(from, to, moving, xDistance);
         handlePieceTakingAndHalfMoveClock(to, moving);
         handleSettingEnPassant(from, moving, yDistance);
-        handleSettingRochadeString(from);
+        handleSettingRochadeString(from, to);
 
         moving.setCoordinate(to);
 
@@ -166,8 +166,8 @@ public class Position {
         }
     }
 
-    private void handleSettingRochadeString(Coordinate from) {
-        this.possibleRochades = PieceHelper.modifyRochadeString(this.possibleRochades, from);
+    private void handleSettingRochadeString(Coordinate from, Coordinate to) {
+        this.possibleRochades = PieceHelper.modifyRochadeString(this.possibleRochades, from, to);
     }
 
     private void handlePieceTakingAndHalfMoveClock(Coordinate to, Piece moving) {

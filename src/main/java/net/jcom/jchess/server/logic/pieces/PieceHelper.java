@@ -59,7 +59,8 @@ public class PieceHelper {
         PieceHelper.checkDir(position, ret, x, y, -1, 0, myColor);
     }
 
-    public static String modifyRochadeString(String prevRochadeString, Coordinate from) {
+    //from to check if own piece moved, to to check if piece is taken
+    public static String modifyRochadeString(String prevRochadeString, Coordinate from, Coordinate to) {
         String ret = prevRochadeString;
 
         if (from.equals(Coordinate.parse("a1"))) {
@@ -76,6 +77,16 @@ public class PieceHelper {
             ret = ret.replace("q", "").replace("k", "");
         }
 
+        if (to.equals(Coordinate.parse("a1"))) {
+            ret = ret.replace("Q", "");
+        } else if (to.equals(Coordinate.parse("a8"))) {
+            ret = ret.replace("q", "");
+        } else if (to.equals(Coordinate.parse("h1"))) {
+            ret = ret.replace("K", "");
+        } else if (to.equals(Coordinate.parse("h1"))) {
+            ret = ret.replace("k", "");
+        }
+
         if (ret.isEmpty()) {
             ret = "-";
         }
@@ -89,7 +100,7 @@ public class PieceHelper {
     }
 
     public static MoveData coordinateToMoveData(Coordinate from, Coordinate to) {
-        return coordinateToMoveData(from, to, "q");
+        return coordinateToMoveData(from, to, null);
     }
 
     public static MoveData coordinateToMoveData(Coordinate from, Coordinate to, String promotion) {

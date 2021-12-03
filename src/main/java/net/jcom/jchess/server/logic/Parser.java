@@ -142,6 +142,7 @@ public class Parser {
     }
 
     public static String moveDataToString(MoveData moveData) {
-        return moveData.getFrom() + moveData.getTo() + moveData.getPromotionUnit();
+        return moveData.getFrom() + moveData.getTo() +
+                (moveData.getPromotionUnit() != null ? moveData.getPromotionUnit() : "");
     }
 }
