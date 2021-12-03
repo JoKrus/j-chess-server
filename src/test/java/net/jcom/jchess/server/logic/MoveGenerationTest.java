@@ -28,7 +28,12 @@ public class MoveGenerationTest {
                 Triple.of("rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8", 2, 1_486L),
                 Triple.of("rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8", 3, 62_379L),
                 Triple.of("rnbq1k1r/pp1Pbppp/2p5/8/2B5/P7/1PP1NnPP/RNBQK2R b KQ - 0 8", 2, 1_373L),
-                Triple.of("rnbq1k1r/pp1Pbppp/2p5/8/2B5/P7/1PP1N1PP/RNBQK2n w Q - 0 9", 1, 40L)
+                Triple.of("rnbq1k1r/pp1Pbppp/2p5/8/2B5/P7/1PP1N1PP/RNBQK2n w Q - 0 9", 1, 40L),
+                Triple.of("r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1", 3, 9_467L),
+                Triple.of("r3k2r/Pppp1ppp/1b3nbN/nP6/BBPPP3/q4N2/Pp4PP/R2Q1RK1 b kq - 0 1", 3, 72_051L),
+                Triple.of("r3k2r/Pp1p1ppp/1b3nbN/nPp5/BBPPP3/q4N2/Pp4PP/R2Q1RK1 w kq c6 0 2", 2, 1_730L),
+                Triple.of("r3k2r/Pp1p1ppp/1bP2nbN/n7/BBPPP3/q4N2/Pp4PP/R2Q1RK1 b kq - 0 2", 1, 45L),
+                Triple.of("r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1", 4, 422_333L)
         );
     }
 
@@ -56,8 +61,8 @@ public class MoveGenerationTest {
 
         var res = moveGenTestRecursive(position, arguments.getMiddle(), ret);
 
-        initMoveToPosAfter.entrySet().stream().map(moveDataLongEntry -> Parser.moveDataToString(moveDataLongEntry.getKey()) + ": " + moveDataLongEntry.getValue())
-                .sorted().forEach(System.out::println);
+        initMoveToPosAfter.entrySet().stream().map(moveDataLongEntry -> Parser.moveDataToString(moveDataLongEntry
+                .getKey()) + ": " + moveDataLongEntry.getValue()).sorted().forEach(System.out::println);
 
         assertEquals(arguments.getRight(), resNewApproach);
         assertEquals(arguments.getRight(), res);

@@ -178,6 +178,13 @@ public class Position {
         }
 
         var possTaken = this.getPieceAt(to);
+        if (possTaken == null && moving.getPieceType() == PieceType.PAWN) {
+            if (to.equals(getEnPassant())) {
+                int dirY = to.getY() == 2 ? 3 : 4;
+                possTaken = this.getPieceAt(Coordinate.of(to.getX(), dirY));
+            }
+        }
+
         if (possTaken != null) {
             var takenPiece = possTaken;
             this.pieceList.remove(takenPiece);
