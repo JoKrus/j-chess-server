@@ -69,7 +69,7 @@ public class PieceHelper {
             ret = ret.replace("q", "");
         } else if (from.equals(Coordinate.parse("h1"))) {
             ret = ret.replace("K", "");
-        } else if (from.equals(Coordinate.parse("h1"))) {
+        } else if (from.equals(Coordinate.parse("h8"))) {
             ret = ret.replace("k", "");
         } else if (from.equals(Coordinate.parse("e1"))) {
             ret = ret.replace("Q", "").replace("K", "");
@@ -83,7 +83,7 @@ public class PieceHelper {
             ret = ret.replace("q", "");
         } else if (to.equals(Coordinate.parse("h1"))) {
             ret = ret.replace("K", "");
-        } else if (to.equals(Coordinate.parse("h1"))) {
+        } else if (to.equals(Coordinate.parse("h8"))) {
             ret = ret.replace("k", "");
         }
 
