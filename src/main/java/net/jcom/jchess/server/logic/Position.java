@@ -193,7 +193,7 @@ public class Position {
     private void handleSettingEnPassant(Coordinate from, Piece moving, int yDistance) {
         if (moving.getPieceType() == PieceType.PAWN) {
             this.halfMoveClock = 0;
-            if (yDistance == 2) {
+            if (Math.abs(yDistance) == 2) {
                 int dir = -Integer.signum(yDistance);
                 this.enPassant = Coordinate.of(from.getX(), from.getY() + dir);
 

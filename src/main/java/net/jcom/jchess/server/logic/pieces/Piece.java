@@ -10,8 +10,8 @@ import java.util.List;
 
 public abstract class Piece {
     private Coordinate coordinate;
-    private Color color;
-    private PieceType pieceType;
+    private final Color color;
+    private final PieceType pieceType;
 
     public Piece(Coordinate coordinate, Color color, PieceType pieceType) {
         this.coordinate = coordinate;
