@@ -83,7 +83,7 @@ public class JChessMessageFactory {
         return msg;
     }
 
-    public static JChessMessage createGameFoundMessage(UUID playerId, String nameWhite) {
+    public static JChessMessage createGameStartMessage(UUID playerId, String nameWhite) {
         var msg = createBaseMessage(playerId, JChessMessageType.GAME_START);
         var gameStartMsg = new GameStartMessage();
         gameStartMsg.setNameWhite(nameWhite);
@@ -114,6 +114,22 @@ public class JChessMessageFactory {
         var moveMsg = new MoveMessage();
         moveMsg.setMove(move);
         msg.setMove(moveMsg);
+        return msg;
+    }
+
+    public static JChessMessage createRequestDrawMessage(UUID playerId, RequestDrawType requestDrawType) {
+        var msg = createBaseMessage(playerId, JChessMessageType.REQUEST_DRAW);
+        var reqDrawMsg = new RequestDrawMessage();
+        reqDrawMsg.setReason(requestDrawType);
+        msg.setRequestDraw(reqDrawMsg);
+        return msg;
+    }
+
+    public static JChessMessage createDrawResponseMessage(UUID playerId, boolean accept) {
+        var msg = createBaseMessage(playerId, JChessMessageType.DRAW_RESPONSE);
+        var drawResMsg = new DrawResponseMessage();
+        drawResMsg.setAccept(accept);
+        msg.setDrawResponse(drawResMsg);
         return msg;
     }
 

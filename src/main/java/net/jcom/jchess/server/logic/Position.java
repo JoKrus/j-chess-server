@@ -8,6 +8,8 @@ import net.jcom.jchess.server.logic.pieces.PieceType;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -22,6 +24,8 @@ public class Position {
     private int round;
 
     private String possibleRochades;
+
+    private HashMap<String, Integer> previousPositions;
 
     public Position() {
         //a8 to h1
@@ -51,10 +55,12 @@ public class Position {
         this.enPassant = Coordinate.parse(possEnPassant);
         this.halfMoveClock = Integer.parseInt(halfMoveCounter);
         this.round = Integer.parseInt(nextRound);
+        this.previousPositions = new HashMap<>();
     }
 
     public Position(Position position) {
         this(position.toFenNotation());
+        this.previousPositions = position.previousPositions;
     }
 
     public Piece getPieceAt(Coordinate coordinate) {
@@ -85,6 +91,101 @@ public class Position {
         }
 
         return piecesThatPutKingInCheck;
+    }
+
+    //current = player that is about to make his move
+    public ChessResult isOverBasedOnPosition() {
+        //wins
+        //checkmate, current can not prevent the king being taken
+        ChessResult overBasedOnCheckmate = checkCheckmate();
+        if (overBasedOnCheckmate != ChessResult.PLAYING) {
+            return overBasedOnCheckmate;
+        }
+
+        //draws
+
+        //stalemate, current can not play a valid move
+        ChessResult overBasedOnStalemate = checkStalemate();
+        if (overBasedOnStalemate != ChessResult.PLAYING) {
+            return overBasedOnStalemate;
+        }
+        //not enough material
+        // - king vs king
+        // - king vs 1 bishop or knight
+        // - king vs 2 knights
+        // - king with minor vs king with minor
+        ChessResult overBasedOnMaterial = checkMaterial();
+        if (overBasedOnMaterial != ChessResult.PLAYING) {
+            return overBasedOnMaterial;
+        }
+        // 50 move rule / forced at 75
+        ChessResult overBasedOnMoveRule = checkMoveRule();
+        if (overBasedOnMoveRule != ChessResult.PLAYING) {
+            return overBasedOnMoveRule;
+        }
+        // threefold repetition (save all played fens) pieces occupy same places, same player to move, castling
+        //     rights are the same, and en passant as well
+        ChessResult overBasedOnRepetition = checkRepetition();
+        if (overBasedOnRepetition != ChessResult.PLAYING) {
+            return overBasedOnRepetition;
+        }
+
+        return ChessResult.PLAYING;
+    }
+
+    private ChessResult checkStalemate() {
+        //checkmate if with every move possible, current would still be in check
+        if (playerInCheck(this.current).isEmpty() && generateAllMoves(this.current).isEmpty()) {
+            return ChessResult.DRAW;
+        }
+
+        return ChessResult.PLAYING;
+    }
+
+    private ChessResult checkCheckmate() {
+        //checkmate if with every move possible, current would still be in check
+        if (!playerInCheck(this.current).isEmpty() && generateAllMoves(this.current).isEmpty()) {
+            return this.current.enemyResult();
+        }
+
+        return ChessResult.PLAYING;
+    }
+
+    private ChessResult checkMaterial() {
+        boolean someMaterialIssuesOccur = false;
+
+        if (this.pieceList.size() == 4 &&
+                this.pieceList.stream().filter(piece -> piece.getPieceType() == PieceType.KNIGHT).count() == 2 &&
+                this.pieceList.stream().collect(Collectors.groupingBy(Piece::getColor, Collectors.counting())).containsValue(3L)) {
+            // 2 Knights of the same color
+            someMaterialIssuesOccur = true;
+        } else if (this.pieceList.size() == 4 &&
+                this.pieceList.stream().filter(piece -> piece.getPieceType() == PieceType.KNIGHT || piece.getPieceType() == PieceType.BISHOP).count() == 2 &&
+                this.pieceList.stream().collect(Collectors.groupingBy(Piece::getColor, Collectors.counting())).containsValue(2L)) {
+            //2 bishops and or knights in the game and only 2 units per team
+            someMaterialIssuesOccur = true;
+        } else if (this.pieceList.size() == 3 &&
+                this.pieceList.stream().filter(piece -> piece.getPieceType() == PieceType.KNIGHT || piece.getPieceType() == PieceType.BISHOP).count() == 1) {
+            //one minor piece on the board
+            someMaterialIssuesOccur = true;
+        } else if (this.pieceList.size() == 2) {
+            //only kings
+            someMaterialIssuesOccur = true;
+        }
+
+        return someMaterialIssuesOccur ? ChessResult.DRAW : ChessResult.PLAYING;
+    }
+
+    private ChessResult checkMoveRule() {
+        return this.halfMoveClock >= 75 ? ChessResult.DRAW : ChessResult.PLAYING;
+    }
+
+    ChessResult checkRequestedMoveRule() {
+        return this.halfMoveClock >= 50 ? ChessResult.DRAW : ChessResult.PLAYING;
+    }
+
+    private ChessResult checkRepetition() {
+        return this.previousPositions.get(this.toFenNotationMinusHalfMovesAndRound()) >= 3 ? ChessResult.DRAW : ChessResult.PLAYING;
     }
 
     public List<Piece> canMoveToSquare(Coordinate square, Color color) {
@@ -139,6 +240,9 @@ public class Position {
         if (this.current == Color.WHITE) {
             this.round++;
         }
+
+        this.previousPositions.put(toFenNotationMinusHalfMovesAndRound(),
+                this.previousPositions.getOrDefault(toFenNotationMinusHalfMovesAndRound(), 0) + 1);
     }
 
     public List<MoveData> generateAllMoves(Color color) {
@@ -250,6 +354,10 @@ public class Position {
         ret.append(this.round);
 
         return ret.toString();
+    }
+
+    private String toFenNotationMinusHalfMovesAndRound() {
+        return Arrays.stream(toFenNotation().split(" ")).limit(4).collect(Collectors.joining(" "));
     }
 
     public List<Piece> getPieceList() {

@@ -15,7 +15,8 @@
             <xs:enumeration value="GameOver"/>
             <xs:enumeration value="AwaitMove"/>
             <xs:enumeration value="Move"/>
-            <!-- TODO add draw request -->
+            <xs:enumeration value="RequestDraw"/>
+            <xs:enumeration value="DrawResponse"/>
         </xs:restriction>
     </xs:simpleType>
 
@@ -37,6 +38,8 @@
                 <!-- User -->
                 <xs:element name="AwaitMove" type="AwaitMoveMessage"/>
                 <xs:element name="Move" type="MoveMessage"/>
+                <xs:element name="RequestDraw" type="RequestDrawMessage"/>
+                <xs:element name="DrawResponse" type="DrawResponseMessage"/>
             </xs:choice>
             <xs:attribute name="messageType" type="JChessMessageType" use="required"/>
             <xs:attribute name="playerId" type="UUID" use="required"/>
@@ -120,6 +123,18 @@
     <xs:complexType name="MoveMessage">
         <xs:sequence>
             <xs:element name="move" type="MoveData"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="RequestDrawMessage">
+        <xs:sequence>
+            <xs:element name="reason" type="RequestDrawType"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="DrawResponseMessage">
+        <xs:sequence>
+            <xs:element name="accept" type="xs:boolean"/>
         </xs:sequence>
     </xs:complexType>
 
@@ -227,5 +242,10 @@
         </xs:restriction>
     </xs:simpleType>
 
-
+    <xs:simpleType name="RequestDrawType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="OFFER"/>
+            <xs:enumeration value="FIFTY_MOVE_RULE"/>
+        </xs:restriction>
+    </xs:simpleType>
 </xs:schema>
