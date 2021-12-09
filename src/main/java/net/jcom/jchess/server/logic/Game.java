@@ -1,8 +1,10 @@
 package net.jcom.jchess.server.logic;
 
 import net.jcom.jchess.server.factory.JChessMessageFactory;
+import net.jcom.jchess.server.generated.JChessMessage;
 import net.jcom.jchess.server.generated.MoveData;
 import net.jcom.jchess.server.generated.TimeControlData;
+import net.jcom.jchess.server.networking.Defaults;
 import net.jcom.jchess.server.networking.Player;
 
 import java.util.HashMap;
@@ -11,22 +13,27 @@ import java.util.List;
 public class Game {
     private final List<Player> playerList;
     private final HashMap<Color, Player> colorPlayerMap;
-    private final MoveData lastMove = null;
+    private final HashMap<Color, Long> timeLeft;
     private ChessResult result;
     private Position position;
+    private final Scheduler scheduler;
+    private MoveData lastMove = null;
 
     public Game(List<Player> playerList) {
         this.playerList = playerList;
-        this.colorPlayerMap = new HashMap<>();
+        this.colorPlayerMap = new HashMap();
         this.colorPlayerMap.put(Color.WHITE, playerList.get(0));
         this.colorPlayerMap.put(Color.BLACK, playerList.get(1));
         this.result = ChessResult.PLAYING;
+        this.timeLeft = new HashMap();
+        this.timeLeft.put(Color.WHITE, MatchDefaults.MATCH_FORMAT_DATA.getTimePerSide());
+        this.timeLeft.put(Color.BLACK, MatchDefaults.MATCH_FORMAT_DATA.getTimePerSide());
+        this.scheduler = new Scheduler();
     }
-
 
     public void start() {
         List<Player> list = this.playerList;
-        for (int i = 0; i < list.size(); i++) {
+        for (int i = 0; i < list.size(); ++i) {
             Player player = list.get(i);
             player.getCommunicator().sendMessage(JChessMessageFactory.createGameStartMessage(player.getId(),
                     this.colorPlayerMap.get(Color.WHITE).getPlayerName()));
@@ -35,42 +42,62 @@ public class Game {
         this.position = new Position();
 
         gameLoop:
-        while (isOver() == ChessResult.PLAYING) {
+        while (this.isOver() == ChessResult.PLAYING) {
             Color currentPlayerColor = this.position.getCurrent();
-            Player currentPlayer = this.colorPlayerMap.get(currentPlayerColor);
-            currentPlayer.getCommunicator().sendMessage(JChessMessageFactory.createAwaitMoveMessage(currentPlayer.getId(), this.position.toFenNotation(), this.lastMove, toTimeControlData(currentPlayerColor)));
-            var message = currentPlayer.getCommunicator().receiveMessage();
+            Player player = this.colorPlayerMap.get(currentPlayerColor);
+            JChessMessage awaitMoveMsg = JChessMessageFactory.createAwaitMoveMessage(player.getId(), this.position.toFenNotation(), this.lastMove, this.toTimeControlData(currentPlayerColor));
+            player.getCommunicator().sendMessage(awaitMoveMsg);
+            this.scheduler.startTimer(currentPlayerColor, () -> {
+                this.result = currentPlayerColor.enemyResult();
+            });
+            long start = System.currentTimeMillis();
+            JChessMessage message = player.getCommunicator().receiveMessage();
+            long endMaybe = System.currentTimeMillis();
+            this.scheduler.stopTimer(currentPlayerColor);
+            if (this.timeLeft.get(currentPlayerColor) - (endMaybe - start) < 0L) {
+                this.result = currentPlayerColor.enemyResult();
+                break;
+            }
 
             switch (message.getMessageType()) {
                 case MOVE:
-                    break;
+                    try {
+                        if (!this.position.checkIfLegalMove(message.getMove().getMove())) {
+                            this.result = currentPlayerColor.enemyResult();
+                            break gameLoop;
+                        }
+
+                        this.position.playMove(message.getMove().getMove());
+                        this.lastMove = message.getMove().getMove();
+                        this.timeLeft.put(currentPlayerColor, this.timeLeft.get(currentPlayerColor) - (endMaybe - start));
+                        this.timeLeft.put(currentPlayerColor, this.timeLeft.get(currentPlayerColor) + MatchDefaults.MATCH_FORMAT_DATA.getTimePerSideIncrement());
+                    } catch (NullPointerException var11) {
+                        this.result = currentPlayerColor.enemyResult();
+                        break gameLoop;
+                    }
                 case REQUEST_DRAW:
+                    //TODO impl request draw logic
                     break;
                 default:
-                    this.result = this.position.getCurrent().enemyResult();
+                    this.result = currentPlayerColor.enemyResult();
                     break gameLoop;
             }
         }
+
+        for (int i = 0; i < list.size(); ++i) {
+            Player player = list.get(i);
+            player.getCommunicator().sendMessage(JChessMessageFactory.createGameOverMessage(player.getId(), this.result == ChessResult.DRAW, this.colorPlayerMap.getOrDefault(this.result.toColor(), Defaults.DEFAULT_PLAYER).getPlayerName()));
+        }
+
     }
 
-    private TimeControlData toTimeControlData(Color color) {
-        //TODO fill
-        TimeControlData timeControlData = new TimeControlData();
-        timeControlData.setYourTimeInMs(0);
-        timeControlData.setEnemyTimeInMs(0);
-        return timeControlData;
-    }
-
-    //gets called with current = player to make his move
     public ChessResult isOver() {
-        //wins
-        //resign? not planned to be implemented
-        //timeout
+        //TODO resign? not planned to be implemented
 
         //draws
 
-        // 50 move rule
-        // draw offer after move 40
+        // TODO 50 move rule
+        // TODO draw offer after move 40
 
         //Position checks
         ChessResult overBasedOnPosition = this.position.isOverBasedOnPosition();
@@ -81,6 +108,13 @@ public class Game {
     }
 
     public ChessResult getResult() {
-        return ChessResult.DRAW;
+        return this.result;
+    }
+
+    public TimeControlData toTimeControlData(Color myTeam) {
+        TimeControlData timeControlData = new TimeControlData();
+        timeControlData.setYourTimeInMs(this.timeLeft.get(myTeam));
+        timeControlData.setEnemyTimeInMs(this.timeLeft.get(myTeam.enemy()));
+        return timeControlData;
     }
 }
