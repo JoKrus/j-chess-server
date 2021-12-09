@@ -14,8 +14,8 @@ public class MatchDefaults {
             this.setPointsPerWin(2);
             this.setPointsPerDraw(1);
         }});
-        setTimePerSide(TimeUnit.MINUTES.toSeconds(15));
-        setTimePerSideIncrement(TimeUnit.SECONDS.toSeconds(10));
-        setTimePerSidePerMove(TimeUnit.SECONDS.toSeconds(60));
+        setTimePerSide(TimeUnit.MINUTES.toMillis(15));
+        setTimePerSideIncrement(TimeUnit.SECONDS.toMillis(10));
+        setTimePerSidePerMove(TimeUnit.SECONDS.toMillis(60));
     }};
 }

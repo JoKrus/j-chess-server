@@ -2,18 +2,18 @@ package net.jcom.jchess.server.logic;
 
 import net.jcom.jchess.server.factory.JChessMessageFactory;
 import net.jcom.jchess.server.generated.MoveData;
+import net.jcom.jchess.server.generated.TimeControlData;
 import net.jcom.jchess.server.networking.Player;
 
 import java.util.HashMap;
 import java.util.List;
 
 public class Game {
-    private List<Player> playerList;
-    HashMap<Color, Player> colorPlayerMap;
-    MoveData lastMove = null;
-    ChessResult result;
+    private final List<Player> playerList;
+    private final HashMap<Color, Player> colorPlayerMap;
+    private final MoveData lastMove = null;
+    private ChessResult result;
     private Position position;
-    //TimeControl
 
     public Game(List<Player> playerList) {
         this.playerList = playerList;
@@ -36,8 +36,9 @@ public class Game {
 
         gameLoop:
         while (isOver() == ChessResult.PLAYING) {
-            Player currentPlayer = this.colorPlayerMap.get(this.position.getCurrent());
-            currentPlayer.getCommunicator().sendMessage(JChessMessageFactory.createAwaitMoveMessage(currentPlayer.getId(), this.position.toFenNotation(), this.lastMove));
+            Color currentPlayerColor = this.position.getCurrent();
+            Player currentPlayer = this.colorPlayerMap.get(currentPlayerColor);
+            currentPlayer.getCommunicator().sendMessage(JChessMessageFactory.createAwaitMoveMessage(currentPlayer.getId(), this.position.toFenNotation(), this.lastMove, toTimeControlData(currentPlayerColor)));
             var message = currentPlayer.getCommunicator().receiveMessage();
 
             switch (message.getMessageType()) {
@@ -50,6 +51,14 @@ public class Game {
                     break gameLoop;
             }
         }
+    }
+
+    private TimeControlData toTimeControlData(Color color) {
+        //TODO fill
+        TimeControlData timeControlData = new TimeControlData();
+        timeControlData.setYourTimeInMs(0);
+        timeControlData.setEnemyTimeInMs(0);
+        return timeControlData;
     }
 
     //gets called with current = player to make his move

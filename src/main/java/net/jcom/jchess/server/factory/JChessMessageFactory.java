@@ -47,7 +47,6 @@ public class JChessMessageFactory {
         var msg = createBaseMessage(playerId, JChessMessageType.DISCONNECT);
         var disconnectMsg = new DisconnectMessage();
         disconnectMsg.setErrorTypeCode(errorType);
-        disconnectMsg.setName(name);
         msg.setDisconnect(disconnectMsg);
         return msg;
     }
@@ -100,11 +99,13 @@ public class JChessMessageFactory {
         return msg;
     }
 
-    public static JChessMessage createAwaitMoveMessage(UUID playerId, String position, MoveData lastMove) {
+    public static JChessMessage createAwaitMoveMessage(UUID playerId, String position, MoveData lastMove,
+                                                       TimeControlData timeControlData) {
         var msg = createBaseMessage(playerId, JChessMessageType.AWAIT_MOVE);
         var awaitMoveMsg = new AwaitMoveMessage();
         awaitMoveMsg.setPosition(position);
         awaitMoveMsg.setLastMove(lastMove);
+        awaitMoveMsg.setTimeControl(timeControlData);
         msg.setAwaitMove(awaitMoveMsg);
         return msg;
     }

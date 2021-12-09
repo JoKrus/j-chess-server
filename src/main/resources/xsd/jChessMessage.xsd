@@ -71,7 +71,6 @@
 
     <xs:complexType name="DisconnectMessage">
         <xs:sequence>
-            <xs:element name="name" type="xs:string"/>
             <xs:element name="errorTypeCode" type="ErrorType"/>
         </xs:sequence>
     </xs:complexType>
@@ -116,7 +115,8 @@
     <xs:complexType name="AwaitMoveMessage">
         <xs:sequence>
             <xs:element name="position" type="FenPosition"/>
-            <xs:element name="lastMove" type="MoveData"/>
+            <xs:element name="lastMove" type="MoveData" minOccurs="0"/>
+            <xs:element name="timeControl" type="TimeControlData"/>
         </xs:sequence>
     </xs:complexType>
 
@@ -210,8 +210,8 @@
         <xs:sequence>
             <xs:element name="namePlayer1" type="xs:string"/>
             <xs:element name="namePlayer2" type="xs:string"/>
-            <xs:element name="scorePlayer1" type="xs:string"/>
-            <xs:element name="scorePlayer2" type="xs:string"/>
+            <xs:element name="scorePlayer1" type="xs:unsignedInt"/>
+            <xs:element name="scorePlayer2" type="xs:unsignedInt"/>
         </xs:sequence>
     </xs:complexType>
 
@@ -226,7 +226,7 @@
         <xs:sequence>
             <xs:element name="from" type="SquareCoordinate"/>
             <xs:element name="to" type="SquareCoordinate"/>
-            <xs:element name="promotionUnit" type="PromotionPiece"/>
+            <xs:element name="promotionUnit" type="PromotionPiece" minOccurs="0"/>
         </xs:sequence>
     </xs:complexType>
 
@@ -248,4 +248,11 @@
             <xs:enumeration value="FIFTY_MOVE_RULE"/>
         </xs:restriction>
     </xs:simpleType>
+
+    <xs:complexType name="TimeControlData">
+        <xs:sequence>
+            <xs:element name="yourTimeInMs" type="xs:unsignedInt"/>
+            <xs:element name="enemyTimeInMs" type="xs:unsignedInt"/>
+        </xs:sequence>
+    </xs:complexType>
 </xs:schema>
