@@ -21,11 +21,11 @@ public class Game {
 
     public Game(List<Player> playerList) {
         this.playerList = playerList;
-        this.colorPlayerMap = new HashMap();
+        this.colorPlayerMap = new HashMap<>();
         this.colorPlayerMap.put(Color.WHITE, playerList.get(0));
         this.colorPlayerMap.put(Color.BLACK, playerList.get(1));
         this.result = ChessResult.PLAYING;
-        this.timeLeft = new HashMap();
+        this.timeLeft = new HashMap<>();
         this.timeLeft.put(Color.WHITE, MatchDefaults.MATCH_FORMAT_DATA.getTimePerSide());
         this.timeLeft.put(Color.BLACK, MatchDefaults.MATCH_FORMAT_DATA.getTimePerSide());
         this.scheduler = new Scheduler();
