@@ -195,17 +195,17 @@ public class Position {
     public boolean checkIfLegalMove(MoveData moveData) {
         Coordinate from = Coordinate.parse(moveData.getFrom());
         Coordinate to = Coordinate.parse(moveData.getTo());
-        if (from != null && to != null) {
-            Piece moving = this.getPieceAt(from);
-            if (moving != null && moving.getColor() == this.getCurrent()) {
-                List<MoveData> possibleTos = moving.possibleToMoveTo(this);
-                return possibleTos.contains(moveData);
-            } else {
-                return false;
-            }
-        } else {
+        if (from == null || to == null) {
             return false;
         }
+
+        Piece moving = this.getPieceAt(from);
+        if (moving == null || moving.getColor() != this.getCurrent()) {
+            return false;
+        }
+
+        List<MoveData> possibleTos = moving.possibleToMoveTo(this);
+        return possibleTos.contains(moveData);
     }
 
     public void playMove(MoveData moveData) {

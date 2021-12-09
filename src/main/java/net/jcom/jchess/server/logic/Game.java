@@ -47,13 +47,13 @@ public class Game {
             Player player = this.colorPlayerMap.get(currentPlayerColor);
             JChessMessage awaitMoveMsg = JChessMessageFactory.createAwaitMoveMessage(player.getId(), this.position.toFenNotation(), this.lastMove, this.toTimeControlData(currentPlayerColor));
             player.getCommunicator().sendMessage(awaitMoveMsg);
-            this.scheduler.startTimer(currentPlayerColor, () -> {
-                this.result = currentPlayerColor.enemyResult();
-            });
+
+            this.scheduler.startTimer(currentPlayerColor, () -> this.result = currentPlayerColor.enemyResult());
             long start = System.currentTimeMillis();
             JChessMessage message = player.getCommunicator().receiveMessage();
             long endMaybe = System.currentTimeMillis();
             this.scheduler.stopTimer(currentPlayerColor);
+
             if (this.timeLeft.get(currentPlayerColor) - (endMaybe - start) < 0L) {
                 this.result = currentPlayerColor.enemyResult();
                 break;
@@ -62,15 +62,15 @@ public class Game {
             switch (message.getMessageType()) {
                 case MOVE:
                     try {
-                        if (!this.position.checkIfLegalMove(message.getMove().getMove())) {
+                        if (this.position.checkIfLegalMove(message.getMove().getMove())) {
+                            this.position.playMove(message.getMove().getMove());
+                            this.lastMove = message.getMove().getMove();
+                            this.timeLeft.put(currentPlayerColor, this.timeLeft.get(currentPlayerColor) - (endMaybe - start));
+                            this.timeLeft.put(currentPlayerColor, this.timeLeft.get(currentPlayerColor) + MatchDefaults.MATCH_FORMAT_DATA.getTimePerSideIncrement());
+                        } else {
                             this.result = currentPlayerColor.enemyResult();
                             break gameLoop;
                         }
-
-                        this.position.playMove(message.getMove().getMove());
-                        this.lastMove = message.getMove().getMove();
-                        this.timeLeft.put(currentPlayerColor, this.timeLeft.get(currentPlayerColor) - (endMaybe - start));
-                        this.timeLeft.put(currentPlayerColor, this.timeLeft.get(currentPlayerColor) + MatchDefaults.MATCH_FORMAT_DATA.getTimePerSideIncrement());
                     } catch (NullPointerException var11) {
                         this.result = currentPlayerColor.enemyResult();
                         break gameLoop;
@@ -88,7 +88,6 @@ public class Game {
             Player player = list.get(i);
             player.getCommunicator().sendMessage(JChessMessageFactory.createGameOverMessage(player.getId(), this.result == ChessResult.DRAW, this.colorPlayerMap.getOrDefault(this.result.toColor(), Defaults.DEFAULT_PLAYER).getPlayerName()));
         }
-
     }
 
     public ChessResult isOver() {
