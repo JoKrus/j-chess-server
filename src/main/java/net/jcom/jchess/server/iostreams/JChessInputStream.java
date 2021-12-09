@@ -23,25 +23,27 @@ public class JChessInputStream {
 
     public JChessInputStream(InputStream inputStream) {
         this.inputStream = inputStream;
+
         try {
             JAXBContext jaxbContext = JAXBContext.newInstance(JChessMessage.class);
             this.unmarshaller = jaxbContext.createUnmarshaller();
             SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+
             try {
-                URL urlToXsd = getClass().getResource("/xsd/JChessXsd/jComMessage.xsd");
+                URL urlToXsd = this.getClass().getResource("/xsd/jChessMessage.xsd");
                 Schema schema = schemaFactory.newSchema(urlToXsd);
                 this.unmarshaller.setSchema(schema);
-                this.unmarshaller.setEventHandler(validationEvent -> false);
-            } catch (SAXException e) {
-                throw new RuntimeException(e);
+                this.unmarshaller.setEventHandler((validationEvent) -> false);
+            } catch (SAXException var6) {
+                throw new RuntimeException(var6);
             }
-        } catch (JAXBException e) {
-            throw new RuntimeException(e);
+        } catch (JAXBException var7) {
+            throw new RuntimeException(var7);
         }
     }
 
     private String readMessage() throws IOException {
-        int messageLength = readHeader();
+        int messageLength = this.readHeader();
         byte[] message = new byte[messageLength];
         IOUtils.readFully(this.inputStream, message);
         return new String(message, StandardCharsets.UTF_8);
@@ -50,17 +52,18 @@ public class JChessInputStream {
     private int readHeader() throws IOException {
         byte[] textLength = new byte[4];
         IOUtils.readFully(this.inputStream, textLength);
-        return new BigInteger(textLength).intValue();
+        return (new BigInteger(textLength)).intValue();
     }
 
     public JChessMessage readJChess() throws IOException {
         JChessMessage result;
         try {
             String xml = this.readMessage();
-            result = XMLToJChess(xml);
-        } catch (JAXBException | NullPointerException e) {
+            result = this.XMLToJChess(xml);
+        } catch (NullPointerException | JAXBException var3) {
             result = null;
         }
+
         return result;
     }
 

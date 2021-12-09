@@ -127,7 +127,7 @@ public class Match {
             }
 
             for (var player : this.playerList) {
-                player.getCommunicator().sendMessage(JChessMessageFactory.createMatchStatusMessage(player.getId(), this.matchFormatData, this.matchStatusData));
+                player.getCommunicator().sendMessage(JChessMessageFactory.createMatchStatusMessage(player.getId(), this.matchStatusData));
             }
         }
         return true;
