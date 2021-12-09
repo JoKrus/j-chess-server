@@ -17,7 +17,7 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <main.class>net.jcom.jchess.server.StartServer</main.class>
-        <xsd.sources.dir>src/main/resources/xsd/jChessMessage.xsd</xsd.sources.dir>
+        <xsd.sources.dir>src/main/resources/xsd</xsd.sources.dir>
         <generated.classes.dir>${project.build.sourceDirectory}</generated.classes.dir>
         <generated.classes.package>${project.groupId}.generated</generated.classes.package>
     </properties>
@@ -188,6 +188,40 @@
                     <appendAssemblyId>true</appendAssemblyId>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jaxb2-maven-plugin</artifactId>
+                <version>2.5.0</version>
+                <executions>
+                    <execution>
+                        <id>xjc</id>
+                        <goals>
+                            <goal>xjc</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <arguments>
+                        <argument>-XsimpleEquals</argument>
+                        <argument>-XsimpleHashCode</argument>
+                    </arguments>
+                    <sources>
+                        <source>${xsd.sources.dir}</source>
+                    </sources>
+                    <!-- The package of your generated sources -->
+                    <packageName>${generated.classes.package}</packageName>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.jvnet.jaxb2_commons</groupId>
+                        <artifactId>jaxb2-basics</artifactId>
+                        <version>0.12.0</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+
+            <!--
             <plugin>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-xjc-plugin</artifactId>
@@ -211,6 +245,7 @@
                     </execution>
                 </executions>
             </plugin>
+            -->
         </plugins>
     </build>
 </project>
