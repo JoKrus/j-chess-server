@@ -16,8 +16,7 @@ import java.util.concurrent.Executors;
 import static net.jcom.jchess.server.StartServer.logger;
 
 public class Communicator {
-    private final static ExecutorService loginQueueHandler = Executors.newFixedThreadPool(1);
-
+    private static final ExecutorService loginQueueHandler = Executors.newFixedThreadPool(1);
     private JChessInputStream fromPlayer;
     private JChessOutputStream toPlayer;
 
@@ -27,35 +26,34 @@ public class Communicator {
     public Communicator(Socket socket) {
         try {
             this.fromPlayer = new JChessInputStream(socket.getInputStream());
-        } catch (IOException e) {
-            logger.error("Could not open InputStream", e);
+        } catch (IOException var4) {
+            logger.error("Could not open InputStream", var4);
         }
         try {
             this.toPlayer = new JChessOutputStream(socket.getOutputStream());
-        } catch (IOException e) {
-            logger.error("Could not open Output Stream", e);
+        } catch (IOException var3) {
+            logger.error("Could not open Output Stream", var3);
         }
     }
 
     public JChessMessage receiveMessage() {
         try {
             return this.fromPlayer.readJChess();
-        } catch (IOException e) {
-            logger.info("Connection was closed unexpected", e);
+        } catch (IOException var2) {
+            logger.info("Connection was closed unexpected", var2);
             Server.getInstance().removePlayer(this);
         }
         return null;
     }
 
-    //true success
     public boolean sendMessage(JChessMessage message) {
         synchronized (this.lock) {
             try {
                 return this.toPlayer.write(message);
-            } catch (SocketException e) {
+            } catch (SocketException var5) {
                 logger.info("Client is not reachable.");
-            } catch (IOException e) {
-                logger.error(e.getLocalizedMessage(), e);
+            } catch (IOException var6) {
+                logger.error(var6.getLocalizedMessage(), var6);
             }
             return false;
         }
@@ -68,11 +66,11 @@ public class Communicator {
                     logger.info("Client is not reachable.");
                     Server.getInstance().removePlayer(this);
                 }
-            } catch (SocketException e) {
+            } catch (SocketException var5) {
                 logger.info("Client is not reachable.");
                 Server.getInstance().removePlayer(this);
-            } catch (IOException e) {
-                logger.error(e.getLocalizedMessage(), e);
+            } catch (IOException var6) {
+                logger.error(var6.getLocalizedMessage(), var6);
                 Server.getInstance().removePlayer(this);
             }
         }
@@ -84,18 +82,23 @@ public class Communicator {
         Player player = null;
         try {
             player = playerFuture.get();
-        } catch (InterruptedException | ExecutionException e) {
-            logger.error(e.getLocalizedMessage(), e);
+        } catch (ExecutionException | InterruptedException var4) {
+            logger.error(var4.getLocalizedMessage(), var4);
         }
         return player;
+    }
+
+    public void sendDisconnectAndKick(JChessMessage disconnectMessage) {
+        this.sendMessage(disconnectMessage);
+        this.close();
     }
 
     public void close() {
         try {
             this.fromPlayer.close();
             this.toPlayer.close();
-        } catch (IOException e) {
-            logger.error(e.getLocalizedMessage(), e);
+        } catch (IOException var2) {
+            logger.error(var2.getLocalizedMessage(), var2);
         }
         Server.getInstance().removePlayer(this);
         logger.info("Removed");
