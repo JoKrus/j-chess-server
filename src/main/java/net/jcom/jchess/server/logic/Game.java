@@ -103,11 +103,6 @@ public class Game {
         }
         //TODO resign? not planned to be implemented
 
-        //draws
-
-        // TODO 50 move rule
-        // TODO draw offer after move 40
-
         //Position checks
         ChessResult overBasedOnPosition = this.position.isOverBasedOnPosition();
         if (overBasedOnPosition != ChessResult.PLAYING) {

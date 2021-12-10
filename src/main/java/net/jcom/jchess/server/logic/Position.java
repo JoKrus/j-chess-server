@@ -48,7 +48,7 @@ public class Position {
 
     public Position(Position position) {
         this(position.toFenNotation());
-        this.previousPositions = new HashMap(position.previousPositions);
+        this.previousPositions = new HashMap<>(position.previousPositions);
     }
 
     public static boolean isFENValidSyntax(String fenString) {
