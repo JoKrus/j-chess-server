@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class Position {
-    private List<Piece> pieceList;
+    private final List<Piece> pieceList;
     private Color current;
     private Coordinate enPassant;
     private int halfMoveClock;
