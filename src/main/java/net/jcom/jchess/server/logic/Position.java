@@ -19,6 +19,7 @@ public class Position {
     private int round;
     private String possibleRochades;
     private HashMap<String, Integer> previousPositions;
+    private List<MoveData> allMoves;
 
     public Position() {
         this("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
@@ -44,11 +45,13 @@ public class Position {
         this.halfMoveClock = Integer.parseInt(halfMoveCounter);
         this.round = Integer.parseInt(nextRound);
         this.previousPositions = new HashMap<>();
+        this.allMoves = new ArrayList<>();
     }
 
     public Position(Position position) {
         this(position.toFenNotation());
         this.previousPositions = new HashMap<>(position.previousPositions);
+        this.allMoves = new ArrayList<>(position.allMoves);
     }
 
     public static boolean isFENValidSyntax(String fenString) {
@@ -255,6 +258,7 @@ public class Position {
             ++this.round;
         }
 
+        this.allMoves.add(moveData);
         this.previousPositions.put(this.toFenNotationMinusHalfMovesAndRound(),
                 this.previousPositions.getOrDefault(this.toFenNotationMinusHalfMovesAndRound(), 0) + 1);
     }
