@@ -3,6 +3,7 @@ package net.jcom.jchess.server.logic;
 import net.jcom.jchess.server.factory.JChessMessageFactory;
 import net.jcom.jchess.server.generated.JChessMessage;
 import net.jcom.jchess.server.generated.MoveData;
+import net.jcom.jchess.server.generated.RequestDrawType;
 import net.jcom.jchess.server.generated.TimeControlData;
 import net.jcom.jchess.server.networking.Defaults;
 import net.jcom.jchess.server.networking.Player;
@@ -42,7 +43,7 @@ public class Game {
         this.position = new Position();
 
         gameLoop:
-        while (this.isOver() == ChessResult.PLAYING) {
+        while ((this.result = this.isOver()) == ChessResult.PLAYING) {
             Color currentPlayerColor = this.position.getCurrent();
             Player player = this.colorPlayerMap.get(currentPlayerColor);
             JChessMessage awaitMoveMsg = JChessMessageFactory.createAwaitMoveMessage(player.getId(), this.position.toFenNotation(), this.lastMove, this.toTimeControlData(currentPlayerColor));
@@ -75,8 +76,14 @@ public class Game {
                         this.result = currentPlayerColor.enemyResult();
                         break gameLoop;
                     }
+                    break;
                 case REQUEST_DRAW:
-                    //TODO impl request draw logic
+                    if (message.getRequestDraw().getReason().equals(RequestDrawType.FIFTY_MOVE_RULE)) {
+                        if (this.position.checkRequestedMoveRule() == ChessResult.DRAW) {
+                            this.result = ChessResult.DRAW;
+                            break gameLoop;
+                        }
+                    }
                     break;
                 default:
                     this.result = currentPlayerColor.enemyResult();
@@ -91,6 +98,9 @@ public class Game {
     }
 
     public ChessResult isOver() {
+        if (this.result != ChessResult.PLAYING) {
+            return this.result;
+        }
         //TODO resign? not planned to be implemented
 
         //draws

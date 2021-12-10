@@ -153,9 +153,6 @@
             <xs:enumeration value="NO_ERROR"/>
             <xs:enumeration value="ERROR"/>
             <xs:enumeration value="AWAIT_LOGIN"/>
-            <xs:enumeration value="AWAIT_MOVE"/>
-            <xs:enumeration value="AWAIT_PROMOTION"/>
-            <xs:enumeration value="ILLEGAL_MOVE"/>
             <xs:enumeration value="TIMEOUT"/>
             <xs:enumeration value="TOO_MANY_TRIES"/>
             <xs:enumeration value="UNSUPPORTED_OPERATION"/>
@@ -244,6 +241,7 @@
 
     <xs:simpleType name="RequestDrawType">
         <xs:restriction base="xs:string">
+            <!-- NOT SUPPORTED -->
             <xs:enumeration value="OFFER"/>
             <xs:enumeration value="FIFTY_MOVE_RULE"/>
         </xs:restriction>
