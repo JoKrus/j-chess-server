@@ -1,0 +1,28 @@
+//made with https://sequencediagram.org/
+
+title j-chess server communication (success)
+
+note over Client,Server#yellow: The server will send you HeartBeat messages constantly. You can safely ignore them, you just need to receive it.
+
+region #lightgreen client login
+note over Client,Server#yellow: Login can also return Accept if the login was unsuccessful (3 tries)
+Client->Server: Login
+Server->Client: LoginReply
+end
+
+space 
+
+region #deepskyblue match
+Server->Client: MatchFound
+loop #aqua match
+Server->Client: GameStart
+loop #aquamarine game
+Server->Client: AwaitMove
+note over Client,Server#yellow: If there are >50 half moves played without a pawn moving or a piece taken, you can also send a RequestDraw
+Client->Server: Move
+end 
+Server->Client: GameOver
+Server->Client: MatchStatus
+end
+Server->Client: MatchOver
+end

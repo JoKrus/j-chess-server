@@ -1,0 +1,314 @@
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="955" height="1074">
+    <desc>
+        %2F%2Fmade%20with%20https%3A%2F%2Fsequencediagram.org%2F%0A%0Atitle%20j-chess%20server%20communication%20(success)%0A%0Anote%20over%20Client%2CServer%23yellow%3A%20The%20server%20will%20send%20you%20HeartBeat%20messages%20constantly.%20You%20can%20safely%20ignore%20them%2C%20you%20just%20need%20to%20receive%20it.%0A%0Aregion%20%23lightgreen%20client%20login%0Anote%20over%20Client%2CServer%23yellow%3A%20Login%20can%20also%20return%20Accept%20if%20the%20login%20was%20unsuccessful%20(3%20tries)%0AClient-%3EServer%3A%20Login%0AServer-%3EClient%3A%20LoginReply%0Aend%0A%0Aspace%20%0A%0Aregion%20%23deepskyblue%20match%0AServer-%3EClient%3A%20MatchFound%0Aloop%20%23aqua%20match%0AServer-%3EClient%3A%20GameStart%0Aloop%20%23aquamarine%20game%0AServer-%3EClient%3A%20AwaitMove%0Anote%20over%20Client%2CServer%23yellow%3A%20If%20there%20are%20%3E50%20half%20moves%20played%20without%20a%20pawn%20moving%20or%20a%20piece%20taken%2C%20you%20can%20also%20send%20a%20RequestDraw%0AClient-%3EServer%3A%20Move%0Aend%20%0AServer-%3EClient%3A%20GameOver%0AServer-%3EClient%3A%20MatchStatus%0Aend%0AServer-%3EClient%3A%20MatchOver%0Aend
+    </desc>
+    <defs/>
+    <g>
+        <g/>
+        <g/>
+        <g/>
+        <g/>
+        <g/>
+        <g/>
+        <g/>
+        <g/>
+        <g/>
+        <g/>
+        <g/>
+        <g/>
+        <g>
+            <rect fill="white" stroke="none" x="0" y="0" width="955" height="1074"/>
+        </g>
+        <g>
+            <text fill="black" stroke="none" font-family="sans-serif" font-size="16.5pt" font-style="normal" font-weight="normal" text-decoration="normal" x="282.2214231" y="24.50280495" text-anchor="start" dominant-baseline="alphabetic" xml:space="preserve">j-chess server communication (success)</text>
+        </g>
+        <g>
+            <rect fill="rgb(233,252,233)" stroke="none" x="49.0056099" y="190.63182251099997" width="857.6816264"
+                  height="197.65595992999997"/>
+            <rect fill="rgb(204,242,255)" stroke="none" x="16.335203300000003" y="453.6285956409999" width="923.0224396"
+                  height="563.5645138499999"/>
+            <rect fill="rgb(204,255,255)" stroke="none" x="32.67040660000001" y="543.472213791" width="890.352033"
+                  height="403.4795215099998"/>
+            <rect fill="rgb(229,255,246)" stroke="none" x="49.0056099" y="633.3158319409998" width="857.6816264"
+                  height="197.65595993"/>
+        </g>
+        <g>
+            <path fill="none" stroke="black" paint-order="fill stroke markers"
+                  d=" M 106.17882145 95.887643371 L 106.17882145 1074.3663210409998" stroke-miterlimit="10"
+                  stroke-width="1.3612669416666667" stroke-dasharray="12.565541,5.445067766666667"/>
+            <path fill="none" stroke="black" paint-order="fill stroke markers"
+                  d=" M 849.51402475 95.887643371 L 849.51402475 1074.3663210409998" stroke-miterlimit="10"
+                  stroke-width="1.3612669416666667" stroke-dasharray="12.565541,5.445067766666667"/>
+        </g>
+        <g>
+            <path fill="none" stroke="none"/>
+            <g>
+                <path fill="white" stroke="black" paint-order="fill stroke markers"
+                      d=" M 69.9551258695 51.782594461 L 142.4025170305 51.782594461 L 142.4025170305 95.887643371 L 69.9551258695 95.887643371 L 69.9551258695 51.782594461 Z"
+                      stroke-miterlimit="10" stroke-width="2.613632528" stroke-dasharray=""/>
+            </g>
+            <g>
+                <g/>
+                <text fill="black" stroke="none" font-family="sans-serif" font-size="11pt" font-style="normal"
+                      font-weight="normal" text-decoration="normal" x="87.67882145" y="79.55244007099999"
+                      text-anchor="start" dominant-baseline="alphabetic" xml:space="preserve">Client</text>
+            </g>
+            <path fill="none" stroke="none"/>
+            <g>
+                <path fill="white" stroke="black" paint-order="fill stroke markers"
+                      d=" M 810.2903291695 51.782594461 L 888.7377203305 51.782594461 L 888.7377203305 95.887643371 L 810.2903291695 95.887643371 L 810.2903291695 51.782594461 Z"
+                      stroke-miterlimit="10" stroke-width="2.613632528" stroke-dasharray=""/>
+            </g>
+            <g>
+                <g/>
+                <text fill="black" stroke="none" font-family="sans-serif" font-size="11pt" font-style="normal"
+                      font-weight="normal" text-decoration="normal" x="828.01402475" y="79.55244007099999"
+                      text-anchor="start" dominant-baseline="alphabetic" xml:space="preserve">Server</text>
+            </g>
+        </g>
+        <g>
+            <path fill="yellow" stroke="black" paint-order="fill stroke markers"
+                  d=" M 91.47713848000001 128.558049971 L 849.51402475 128.558049971 L 864.21570772 143.259732941 L 864.21570772 166.12901756099998 L 91.47713848000001 166.12901756099998 L 91.47713848000001 128.558049971 M 849.51402475 128.558049971 L 849.51402475 143.259732941 L 864.21570772 143.259732941"
+                  stroke-miterlimit="10" stroke-width="1.3612669416666667" stroke-dasharray=""/>
+            <g>
+                <text fill="black" stroke="none" font-family="sans-serif" font-size="11pt" font-style="normal" font-weight="normal" text-decoration="normal" x="114.34642309999998" y="151.42733459099995" text-anchor="start" dominant-baseline="alphabetic" xml:space="preserve">The server will send you HeartBeat messages constantly. You can safely ignore them, you just need to receive it.</text>
+            </g>
+            <path fill="yellow" stroke="black" paint-order="fill stroke markers"
+                  d=" M 91.47713848000001 234.73687142099993 L 849.51402475 234.73687142099993 L 864.21570772 249.43855439099994 L 864.21570772 272.30783901099994 L 91.47713848000001 272.30783901099994 L 91.47713848000001 234.73687142099993 M 849.51402475 234.73687142099993 L 849.51402475 249.43855439099994 L 864.21570772 249.43855439099994"
+                  stroke-miterlimit="10" stroke-width="1.3612669416666667" stroke-dasharray=""/>
+            <g>
+                <text fill="black" stroke="none" font-family="sans-serif" font-size="11pt" font-style="normal" font-weight="normal" text-decoration="normal" x="262.8464231" y="257.6061560409999" text-anchor="start" dominant-baseline="alphabetic" xml:space="preserve">Login can also return Accept if the login was unsuccessful (3 tries)</text>
+            </g>
+            <g>
+                <g>
+                    <rect fill="rgb(233,252,233)" stroke="none" x="457.89614260499997" y="296.8106439609999"
+                          width="39.90056099" height="21.23576429"/>
+                </g>
+                <text fill="black" stroke="none" font-family="sans-serif" font-size="11pt" font-style="normal"
+                      font-weight="normal" text-decoration="normal" x="460.3464231" y="311.5123269309999"
+                      text-anchor="start" dominant-baseline="alphabetic" xml:space="preserve">Login</text>
+            </g>
+            <g>
+                <path fill="none" stroke="black" paint-order="fill stroke markers"
+                      d=" M 106.17882145 318.04640825099995 L 836.0647073663333 318.04640825099995"
+                      stroke-miterlimit="10" stroke-width="1.3612669416666667" stroke-dasharray=""/>
+                <g transform="translate(849.51402475,318.04640825099995) translate(-849.51402475,-318.04640825099995)">
+                    <path fill="black" stroke="none" paint-order="stroke fill markers"
+                          d=" M 835.9013553333333 311.2400735426666 L 849.51402475 318.04640825099995 L 835.9013553333333 324.8527429593333 Z"/>
+                </g>
+            </g>
+            <g>
+                <g>
+                    <rect fill="rgb(233,252,233)" stroke="none" x="439.39614260499997" y="342.54921320099993"
+                          width="76.90056099" height="21.23576429"/>
+                </g>
+                <text fill="black" stroke="none" font-family="sans-serif" font-size="11pt" font-style="normal"
+                      font-weight="normal" text-decoration="normal" x="441.8464231" y="357.2508961709999"
+                      text-anchor="start" dominant-baseline="alphabetic" xml:space="preserve">LoginReply</text>
+            </g>
+            <g>
+                <path fill="none" stroke="black" paint-order="fill stroke markers"
+                      d=" M 849.51402475 363.78497749099995 L 119.62813883366667 363.78497749099995"
+                      stroke-miterlimit="10" stroke-width="1.3612669416666667" stroke-dasharray=""/>
+                <g transform="translate(106.17882145,363.78497749099995) translate(-106.17882145,-363.78497749099995)">
+                    <path fill="black" stroke="none" paint-order="stroke fill markers"
+                          d=" M 119.79149086666666 356.9786427826666 L 106.17882145 363.78497749099995 L 119.79149086666666 370.5913121993333 Z"/>
+                </g>
+            </g>
+            <g>
+                <g>
+                    <rect fill="rgb(204,242,255)" stroke="none" x="435.39614260499997" y="497.7336445509999"
+                          width="84.90056099" height="21.23576429"/>
+                </g>
+                <text fill="black" stroke="none" font-family="sans-serif" font-size="11pt" font-style="normal"
+                      font-weight="normal" text-decoration="normal" x="437.8464231" y="512.4353275209999"
+                      text-anchor="start" dominant-baseline="alphabetic" xml:space="preserve">MatchFound</text>
+            </g>
+            <g>
+                <path fill="none" stroke="black" paint-order="fill stroke markers"
+                      d=" M 849.51402475 518.9694088409999 L 119.62813883366667 518.9694088409999"
+                      stroke-miterlimit="10" stroke-width="1.3612669416666667" stroke-dasharray=""/>
+                <g transform="translate(106.17882145,518.9694088409999) translate(-106.17882145,-518.9694088409999)">
+                    <path fill="black" stroke="none" paint-order="stroke fill markers"
+                          d=" M 119.79149086666666 512.1630741326666 L 106.17882145 518.9694088409999 L 119.79149086666666 525.7757435493332 Z"/>
+                </g>
+            </g>
+            <g>
+                <g>
+                    <rect fill="rgb(204,255,255)" stroke="none" x="439.89614260499997" y="587.5772627009999"
+                          width="75.90056099" height="21.23576429"/>
+                </g>
+                <text fill="black" stroke="none" font-family="sans-serif" font-size="11pt" font-style="normal"
+                      font-weight="normal" text-decoration="normal" x="442.3464231" y="602.2789456709999"
+                      text-anchor="start" dominant-baseline="alphabetic" xml:space="preserve">GameStart</text>
+            </g>
+            <g>
+                <path fill="none" stroke="black" paint-order="fill stroke markers"
+                      d=" M 849.51402475 608.8130269909999 L 119.62813883366667 608.8130269909999"
+                      stroke-miterlimit="10" stroke-width="1.3612669416666667" stroke-dasharray=""/>
+                <g transform="translate(106.17882145,608.8130269909999) translate(-106.17882145,-608.8130269909999)">
+                    <path fill="black" stroke="none" paint-order="stroke fill markers"
+                          d=" M 119.79149086666666 602.0066922826666 L 106.17882145 608.8130269909999 L 119.79149086666666 615.6193616993332 Z"/>
+                </g>
+            </g>
+            <g>
+                <g>
+                    <rect fill="rgb(229,255,246)" stroke="none" x="440.89614260499997" y="677.4208808509998"
+                          width="73.90056099" height="21.23576429"/>
+                </g>
+                <text fill="black" stroke="none" font-family="sans-serif" font-size="11pt" font-style="normal"
+                      font-weight="normal" text-decoration="normal" x="443.3464231" y="692.1225638209997"
+                      text-anchor="start" dominant-baseline="alphabetic" xml:space="preserve">AwaitMove</text>
+            </g>
+            <g>
+                <path fill="none" stroke="black" paint-order="fill stroke markers"
+                      d=" M 849.51402475 698.6566451409998 L 119.62813883366667 698.6566451409998"
+                      stroke-miterlimit="10" stroke-width="1.3612669416666667" stroke-dasharray=""/>
+                <g transform="translate(106.17882145,698.6566451409998) translate(-106.17882145,-698.6566451409998)">
+                    <path fill="black" stroke="none" paint-order="stroke fill markers"
+                          d=" M 119.79149086666666 691.8503104326664 L 106.17882145 698.6566451409998 L 119.79149086666666 705.4629798493331 Z"/>
+                </g>
+            </g>
+            <path fill="yellow" stroke="black" paint-order="fill stroke markers"
+                  d=" M 91.47713848000001 723.1594500909998 L 849.51402475 723.1594500909998 L 864.21570772 737.8611330609998 L 864.21570772 760.7304176809998 L 91.47713848000001 760.7304176809998 L 91.47713848000001 723.1594500909998 M 849.51402475 723.1594500909998 L 849.51402475 737.8611330609998 L 864.21570772 737.8611330609998"
+                  stroke-miterlimit="10" stroke-width="1.3612669416666667" stroke-dasharray=""/>
+            <g>
+                <text fill="black" stroke="none" font-family="sans-serif" font-size="11pt" font-style="normal" font-weight="normal" text-decoration="normal" x="122.84642309999998" y="746.0287347109999" text-anchor="start" dominant-baseline="alphabetic" xml:space="preserve">If there are &gt;50 half moves played without a pawn moving or a piece taken, you can also send a RequestDraw</text>
+            </g>
+            <g>
+                <g>
+                    <rect fill="rgb(229,255,246)" stroke="none" x="458.39614260499997" y="785.2332226309998"
+                          width="38.90056099" height="21.23576429"/>
+                </g>
+                <text fill="black" stroke="none" font-family="sans-serif" font-size="11pt" font-style="normal"
+                      font-weight="normal" text-decoration="normal" x="460.8464231" y="799.9349056009997"
+                      text-anchor="start" dominant-baseline="alphabetic" xml:space="preserve">Move</text>
+            </g>
+            <g>
+                <path fill="none" stroke="black" paint-order="fill stroke markers"
+                      d=" M 106.17882145 806.4689869209998 L 836.0647073663333 806.4689869209998" stroke-miterlimit="10"
+                      stroke-width="1.3612669416666667" stroke-dasharray=""/>
+                <g transform="translate(849.51402475,806.4689869209998) translate(-849.51402475,-806.4689869209998)">
+                    <path fill="black" stroke="none" paint-order="stroke fill markers"
+                          d=" M 835.9013553333333 799.6626522126664 L 849.51402475 806.4689869209998 L 835.9013553333333 813.2753216293331 Z"/>
+                </g>
+            </g>
+            <g>
+                <g>
+                    <rect fill="rgb(204,255,255)" stroke="none" x="439.39614260499997" y="855.4745968209997"
+                          width="76.90056099" height="21.23576429"/>
+                </g>
+                <text fill="black" stroke="none" font-family="sans-serif" font-size="11pt" font-style="normal"
+                      font-weight="normal" text-decoration="normal" x="441.8464231" y="870.1762797909997"
+                      text-anchor="start" dominant-baseline="alphabetic" xml:space="preserve">GameOver</text>
+            </g>
+            <g>
+                <path fill="none" stroke="black" paint-order="fill stroke markers"
+                      d=" M 849.51402475 876.7103611109998 L 119.62813883366667 876.7103611109998"
+                      stroke-miterlimit="10" stroke-width="1.3612669416666667" stroke-dasharray=""/>
+                <g transform="translate(106.17882145,876.7103611109998) translate(-106.17882145,-876.7103611109998)">
+                    <path fill="black" stroke="none" paint-order="stroke fill markers"
+                          d=" M 119.79149086666666 869.9040264026664 L 106.17882145 876.7103611109998 L 119.79149086666666 883.5166958193331 Z"/>
+                </g>
+            </g>
+            <g>
+                <g>
+                    <rect fill="rgb(204,255,255)" stroke="none" x="434.89614260499997" y="901.2131660609997"
+                          width="85.90056099" height="21.23576429"/>
+                </g>
+                <text fill="black" stroke="none" font-family="sans-serif" font-size="11pt" font-style="normal"
+                      font-weight="normal" text-decoration="normal" x="437.3464231" y="915.9148490309997"
+                      text-anchor="start" dominant-baseline="alphabetic" xml:space="preserve">MatchStatus</text>
+            </g>
+            <g>
+                <path fill="none" stroke="black" paint-order="fill stroke markers"
+                      d=" M 849.51402475 922.4489303509997 L 119.62813883366667 922.4489303509997"
+                      stroke-miterlimit="10" stroke-width="1.3612669416666667" stroke-dasharray=""/>
+                <g transform="translate(106.17882145,922.4489303509997) translate(-106.17882145,-922.4489303509997)">
+                    <path fill="black" stroke="none" paint-order="stroke fill markers"
+                          d=" M 119.79149086666666 915.6425956426664 L 106.17882145 922.4489303509997 L 119.79149086666666 929.255265059333 Z"/>
+                </g>
+            </g>
+            <g>
+                <g>
+                    <rect fill="rgb(204,242,255)" stroke="none" x="439.89614260499997" y="971.4545402509997"
+                          width="75.90056099" height="21.23576429"/>
+                </g>
+                <text fill="black" stroke="none" font-family="sans-serif" font-size="11pt" font-style="normal"
+                      font-weight="normal" text-decoration="normal" x="442.3464231" y="986.1562232209997"
+                      text-anchor="start" dominant-baseline="alphabetic" xml:space="preserve">MatchOver</text>
+            </g>
+            <g>
+                <path fill="none" stroke="black" paint-order="fill stroke markers"
+                      d=" M 849.51402475 992.6903045409997 L 119.62813883366667 992.6903045409997"
+                      stroke-miterlimit="10" stroke-width="1.3612669416666667" stroke-dasharray=""/>
+                <g transform="translate(106.17882145,992.6903045409997) translate(-106.17882145,-992.6903045409997)">
+                    <path fill="black" stroke="none" paint-order="stroke fill markers"
+                          d=" M 119.79149086666666 985.8839698326664 L 106.17882145 992.6903045409997 L 119.79149086666666 999.496639249333 Z"/>
+                </g>
+            </g>
+            <g>
+                <g/>
+                <path fill="none" stroke="black" paint-order="fill stroke markers"
+                      d=" M 49.0056099 190.63182251099997 L 906.6872363 190.63182251099997 L 906.6872363 388.28778244099993 L 49.0056099 388.28778244099993 L 49.0056099 190.63182251099997 Z"
+                      stroke-miterlimit="10" stroke-width="2.3336004714285714" stroke-dasharray=""/>
+                <path fill="lightgreen" stroke="black" paint-order="fill stroke markers"
+                      d=" M 49.0056099 190.63182251099997 L 49.0056099 210.23406647099998 L 117.6760165 210.23406647099998 L 127.47713848000001 200.43294449099997 L 127.47713848000001 190.63182251099997 L 49.0056099 190.63182251099997"
+                      stroke-miterlimit="10" stroke-width="2.3336004714285714" stroke-dasharray=""/>
+                <text fill="black" stroke="none" font-family="sans-serif" font-size="8.8pt" font-style="normal"
+                      font-weight="bold" text-decoration="normal" x="65.3408132" y="203.69998515099996"
+                      text-anchor="start" dominant-baseline="alphabetic" xml:space="preserve">region</text>
+                <text fill="black" stroke="none" font-family="sans-serif" font-size="8.8pt" font-style="normal"
+                      font-weight="bold" text-decoration="normal" x="143.81234178" y="203.69998515099996"
+                      text-anchor="start" dominant-baseline="alphabetic" xml:space="preserve">[client login]</text>
+            </g>
+            <g>
+                <g/>
+                <path fill="none" stroke="black" paint-order="fill stroke markers"
+                      d=" M 16.335203300000003 453.6285956409999 L 939.3576429 453.6285956409999 L 939.3576429 1017.1931094909999 L 16.335203300000003 1017.1931094909999 L 16.335203300000003 453.6285956409999 Z"
+                      stroke-miterlimit="10" stroke-width="2.3336004714285714" stroke-dasharray=""/>
+                <path fill="deepskyblue" stroke="black" paint-order="fill stroke markers"
+                      d=" M 16.335203300000003 453.6285956409999 L 16.335203300000003 473.2308396009999 L 85.0056099 473.2308396009999 L 94.80673188 463.4297176209999 L 94.80673188 453.6285956409999 L 16.335203300000003 453.6285956409999"
+                      stroke-miterlimit="10" stroke-width="2.3336004714285714" stroke-dasharray=""/>
+                <text fill="black" stroke="none" font-family="sans-serif" font-size="8.8pt" font-style="normal"
+                      font-weight="bold" text-decoration="normal" x="32.67040660000001" y="466.6967582809999"
+                      text-anchor="start" dominant-baseline="alphabetic" xml:space="preserve">region</text>
+                <text fill="black" stroke="none" font-family="sans-serif" font-size="8.8pt" font-style="normal"
+                      font-weight="bold" text-decoration="normal" x="111.14193518" y="466.6967582809999"
+                      text-anchor="start" dominant-baseline="alphabetic" xml:space="preserve">[match]</text>
+            </g>
+            <g>
+                <g/>
+                <path fill="none" stroke="black" paint-order="fill stroke markers"
+                      d=" M 32.67040660000001 543.472213791 L 923.0224396 543.472213791 L 923.0224396 946.9517353009998 L 32.67040660000001 946.9517353009998 L 32.67040660000001 543.472213791 Z"
+                      stroke-miterlimit="10" stroke-width="2.3336004714285714" stroke-dasharray=""/>
+                <path fill="aqua" stroke="black" paint-order="fill stroke markers"
+                      d=" M 32.67040660000001 543.472213791 L 32.67040660000001 563.074457751 L 89.34081320000001 563.074457751 L 99.14193518000002 553.2733357709999 L 99.14193518000002 543.472213791 L 32.67040660000001 543.472213791"
+                      stroke-miterlimit="10" stroke-width="2.3336004714285714" stroke-dasharray=""/>
+                <text fill="black" stroke="none" font-family="sans-serif" font-size="8.8pt" font-style="normal"
+                      font-weight="bold" text-decoration="normal" x="49.00560990000001" y="556.5403764309999"
+                      text-anchor="start" dominant-baseline="alphabetic" xml:space="preserve">loop</text>
+                <text fill="black" stroke="none" font-family="sans-serif" font-size="8.8pt" font-style="normal"
+                      font-weight="bold" text-decoration="normal" x="115.47713848000002" y="556.5403764309999"
+                      text-anchor="start" dominant-baseline="alphabetic" xml:space="preserve">[match]</text>
+            </g>
+            <g>
+                <g/>
+                <path fill="none" stroke="black" paint-order="fill stroke markers"
+                      d=" M 49.0056099 633.3158319409998 L 906.6872363 633.3158319409998 L 906.6872363 830.9717918709998 L 49.0056099 830.9717918709998 L 49.0056099 633.3158319409998 Z"
+                      stroke-miterlimit="10" stroke-width="2.3336004714285714" stroke-dasharray=""/>
+                <path fill="aquamarine" stroke="black" paint-order="fill stroke markers"
+                      d=" M 49.0056099 633.3158319409998 L 49.0056099 652.9180759009998 L 105.6760165 652.9180759009998 L 115.47713848000001 643.1169539209998 L 115.47713848000001 633.3158319409998 L 49.0056099 633.3158319409998"
+                      stroke-miterlimit="10" stroke-width="2.3336004714285714" stroke-dasharray=""/>
+                <text fill="black" stroke="none" font-family="sans-serif" font-size="8.8pt" font-style="normal"
+                      font-weight="bold" text-decoration="normal" x="65.3408132" y="646.3839945809998"
+                      text-anchor="start" dominant-baseline="alphabetic" xml:space="preserve">loop</text>
+                <text fill="black" stroke="none" font-family="sans-serif" font-size="8.8pt" font-style="normal"
+                      font-weight="bold" text-decoration="normal" x="131.81234178" y="646.3839945809998"
+                      text-anchor="start" dominant-baseline="alphabetic" xml:space="preserve">[game]</text>
+            </g>
+        </g>
+        <g/>
+        <g/>
+    </g>
+</svg>
