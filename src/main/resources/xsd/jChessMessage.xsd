@@ -109,6 +109,7 @@
         <xs:sequence>
             <xs:element name="winner" type="xs:string"/>
             <xs:element name="isDraw" type="xs:boolean"/>
+            <xs:element name="pgn" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
 

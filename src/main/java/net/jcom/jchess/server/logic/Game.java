@@ -8,6 +8,8 @@ import net.jcom.jchess.server.generated.TimeControlData;
 import net.jcom.jchess.server.networking.Defaults;
 import net.jcom.jchess.server.networking.Player;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 
@@ -18,10 +20,12 @@ public class Game {
     private ChessResult result;
     private Position position;
     private final Scheduler scheduler;
+    private final int round;
     private MoveData lastMove = null;
 
-    public Game(List<Player> playerList) {
+    public Game(List<Player> playerList, int round) {
         this.playerList = playerList;
+        this.round = round;
         this.colorPlayerMap = new HashMap<>();
         this.colorPlayerMap.put(Color.WHITE, playerList.get(0));
         this.colorPlayerMap.put(Color.BLACK, playerList.get(1));
@@ -93,7 +97,9 @@ public class Game {
 
         for (int i = 0; i < list.size(); ++i) {
             Player player = list.get(i);
-            player.getCommunicator().sendMessage(JChessMessageFactory.createGameOverMessage(player.getId(), this.result == ChessResult.DRAW, this.colorPlayerMap.getOrDefault(this.result.toColor(), Defaults.DEFAULT_PLAYER).getPlayerName()));
+            player.getCommunicator().sendMessage(JChessMessageFactory.createGameOverMessage(player.getId(), this.result == ChessResult.DRAW,
+                    this.colorPlayerMap.getOrDefault(this.result.toColor(), Defaults.DEFAULT_PLAYER).getPlayerName(),
+                    this.toPgnNotation()));
         }
     }
 
@@ -120,5 +126,41 @@ public class Game {
         timeControlData.setYourTimeInMs(this.timeLeft.get(myTeam));
         timeControlData.setEnemyTimeInMs(this.timeLeft.get(myTeam.enemy()));
         return timeControlData;
+    }
+
+
+    public String toPgnNotation() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(tagPairToString("Event", "j-chess online game")).append("\n");
+        sb.append(tagPairToString("Site", "chess.j-com.net")).append("\n");
+        sb.append(tagPairToString("Date", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE))
+                .replace("-", ".")).append("\n");
+        sb.append(tagPairToString("Round", String.format("%d", this.round))).append("\n");
+        sb.append(tagPairToString("White", this.colorPlayerMap.get(Color.WHITE).getPlayerName())).append("\n");
+        sb.append(tagPairToString("Black", this.colorPlayerMap.get(Color.BLACK).getPlayerName())).append("\n");
+        sb.append(tagPairToString("Result", this.getResult().toPgnResult())).append("\n");
+        sb.append("\n");
+
+        var movesExtended = this.position.getAllMoves();
+
+        boolean isWhiteMove = true;
+        int gameTurn = 0;
+        for (int i = 0; i < movesExtended.size(); i++) {
+            if (isWhiteMove) {
+                gameTurn++;
+                sb.append(gameTurn).append(". ");
+            }
+            sb.append(movesExtended.get(i).toMoveText()).append(" ");
+
+            isWhiteMove = !isWhiteMove;
+        }
+
+        sb.append(this.result.toPgnResult()).append("\n\n");
+
+        return sb.toString();
+    }
+
+    private String tagPairToString(String tag, String value) {
+        return String.format("[%s \"%s\"]", tag, value);
     }
 }

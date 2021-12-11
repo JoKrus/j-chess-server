@@ -95,7 +95,7 @@ public class Match {
 
         for (int i = 0; i < scoreData.getAmountToPlay(); ++i) {
             Collections.reverse(this.playerList);
-            Game game = new Game(this.playerList);
+            Game game = new Game(this.playerList, i + 1);
             game.start();
             ChessResult result = game.getResult();
             boolean isPlayer1White = this.playerList.get(0).getPlayerName().equals(this.matchStatusData.getNamePlayer1());

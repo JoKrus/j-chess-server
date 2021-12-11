@@ -86,11 +86,12 @@ public class JChessMessageFactory {
         return msg;
     }
 
-    public static JChessMessage createGameOverMessage(UUID playerId, boolean isDraw, String winner) {
+    public static JChessMessage createGameOverMessage(UUID playerId, boolean isDraw, String winner, String pgn) {
         JChessMessage msg = createBaseMessage(playerId, JChessMessageType.GAME_OVER);
         GameOverMessage gameOverMsg = new GameOverMessage();
         gameOverMsg.setIsDraw(isDraw);
         gameOverMsg.setWinner(winner);
+        gameOverMsg.setPgn(pgn);
         msg.setGameOver(gameOverMsg);
         return msg;
     }

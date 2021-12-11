@@ -10,4 +10,18 @@ public enum ChessResult {
             return this == BLACK ? Color.BLACK : null;
         }
     }
+
+    public String toPgnResult() {
+        switch (this) {
+            case BLACK:
+                return "0-1";
+            case WHITE:
+                return "1-0";
+            case DRAW:
+                return "1/2-1/2";
+            case PLAYING:
+                return "*";
+        }
+        return "";
+    }
 }

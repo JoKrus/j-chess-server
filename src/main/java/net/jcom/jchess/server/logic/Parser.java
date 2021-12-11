@@ -66,9 +66,17 @@ public class Parser {
     }
 
     private static String parsePieceType(Piece piece) {
-        switch (piece.getPieceType()) {
+        return parsePieceType(piece.getPieceType());
+    }
+
+    public static String parsePieceType(PieceType pieceType) {
+        return parsePieceType(pieceType, false);
+    }
+
+    public static String parsePieceType(PieceType pieceType, boolean isPawnEmpty) {
+        switch (pieceType) {
             case PAWN:
-                return "p";
+                return isPawnEmpty ? "" : "p";
             case BISHOP:
                 return "b";
             case KNIGHT:
@@ -80,7 +88,7 @@ public class Parser {
             case KING:
                 return "k";
             default:
-                return null;
+                return "";
         }
     }
 

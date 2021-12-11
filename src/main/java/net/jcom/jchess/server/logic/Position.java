@@ -1,5 +1,6 @@
 package net.jcom.jchess.server.logic;
 
+import net.jcom.jchess.server.data.MoveDataExpanded;
 import net.jcom.jchess.server.generated.MoveData;
 import net.jcom.jchess.server.logic.pieces.King;
 import net.jcom.jchess.server.logic.pieces.Piece;
@@ -19,7 +20,7 @@ public class Position {
     private int round;
     private String possibleRochades;
     private HashMap<String, Integer> previousPositions;
-    private List<MoveData> allMoves;
+    private List<MoveDataExpanded> allMoves;
 
     public Position() {
         this("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
@@ -245,8 +246,8 @@ public class Position {
         int yDistance = from.getY() - to.getY();
         int xDistance = from.getX() - to.getX();
 
-        this.handleRochade(from, to, moving, xDistance);
-        this.handlePieceTakingAndHalfMoveClock(to, moving);
+        var rochadeResult = this.handleRochade(from, to, moving, xDistance);
+        var isPieceTaken = this.handlePieceTakingAndHalfMoveClock(to, moving);
         this.handleSettingEnPassant(from, moving, yDistance);
         this.handleSettingRochadeString(from, to);
 
@@ -258,16 +259,21 @@ public class Position {
             ++this.round;
         }
 
-        this.allMoves.add(moveData);
-        this.previousPositions.put(this.toFenNotationMinusHalfMovesAndRound(),
-                this.previousPositions.getOrDefault(this.toFenNotationMinusHalfMovesAndRound(), 0) + 1);
+        if (!force) {
+            this.allMoves.add(new MoveDataExpanded(moveData, moving.getPieceType(), rochadeResult, isPieceTaken,
+                    !playerInCheck(this.current).isEmpty(), checkCheckmate() != ChessResult.PLAYING));
+            this.previousPositions.put(this.toFenNotationMinusHalfMovesAndRound(),
+                    this.previousPositions.getOrDefault(this.toFenNotationMinusHalfMovesAndRound(), 0) + 1);
+        }
     }
 
-    private void handleRochade(Coordinate from, Coordinate to, Piece moving, int xDistance) {
+    private String handleRochade(Coordinate from, Coordinate to, Piece moving, int xDistance) {
         if (moving.getPieceType() == PieceType.KING && Math.abs(xDistance) == 2) {
             Pair<Piece, Coordinate> rookMove = PieceHelper.getRochadeRook(this, from, to);
             rookMove.getLeft().setCoordinate(rookMove.getRight());
+            return to.getX() == 2 ? "O-O-O" : "O-O";
         }
+        return "";
     }
 
     private void handleSettingRochadeString(Coordinate from, Coordinate to) {
@@ -299,7 +305,8 @@ public class Position {
         }
     }
 
-    private void handlePieceTakingAndHalfMoveClock(Coordinate to, Piece moving) {
+    //true if piece was taken
+    private boolean handlePieceTakingAndHalfMoveClock(Coordinate to, Piece moving) {
         if (moving.getPieceType() != PieceType.PAWN) {
             ++this.halfMoveClock;
         } else {
@@ -323,7 +330,13 @@ public class Position {
             */
             //Reset if piece is taken
             this.halfMoveClock = 0;
+            return true;
         }
+        return false;
+    }
+
+    public List<MoveDataExpanded> getAllMoves() {
+        return this.allMoves;
     }
 
     public String toFenNotation() {
