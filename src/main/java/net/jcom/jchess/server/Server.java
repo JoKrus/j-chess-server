@@ -49,7 +49,7 @@ public class Server {
                 .stream().filter((player) -> player.getStatus() == PlayerStatus.QUEUE)
                 .collect(Collectors.toList());
         //TODO to ensure, player 3 also gets matched at some point, maybe take queue time into account
-        Collections.shuffle(this.connectedPlayers);
+        Collections.shuffle(queueingPlayers);
         if (queueingPlayers.size() % 2 == 1) {
             queueingPlayers.remove(queueingPlayers.size() - 1);
         }
