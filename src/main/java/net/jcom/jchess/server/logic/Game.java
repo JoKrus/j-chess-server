@@ -88,7 +88,8 @@ public class Game {
                             break gameLoop;
                         }
                     }
-                    break;
+                    this.result = currentPlayerColor.enemyResult();
+                    break gameLoop;
                 default:
                     this.result = currentPlayerColor.enemyResult();
                     break gameLoop;
