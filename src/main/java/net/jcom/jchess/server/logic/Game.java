@@ -64,6 +64,11 @@ public class Game {
                 break;
             }
 
+            if (message == null) {
+                this.result = currentPlayerColor.enemyResult();
+                break;
+            }
+
             switch (message.getMessageType()) {
                 case MOVE:
                     try {

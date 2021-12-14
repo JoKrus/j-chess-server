@@ -10,7 +10,7 @@ public class MatchDefaults {
     public static final MatchFormatData MATCH_FORMAT_DATA = new MatchFormatData() {{
         setMatchTypeValue(MatchTypeValue.SCORE);
         setMatchTypeData(new MatchTypeScore() {{
-            this.setAmountToPlay(1);
+            this.setAmountToPlay(4);
             this.setPointsPerWin(2);
             this.setPointsPerDraw(1);
         }});
