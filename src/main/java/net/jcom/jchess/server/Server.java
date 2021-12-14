@@ -32,7 +32,7 @@ public class Server {
     private Server() {
         try {
             this.serverSocket = new ServerSocket(Settings.getInt(Settings.PORT));
-            this.sslServerSocket = SSLServerSocketFactory.getDefault().createServerSocket(5124);
+            this.sslServerSocket = SSLServerSocketFactory.getDefault().createServerSocket(Settings.getInt(Settings.SSL_PORT));
         } catch (IOException e) {
             logger.fatal("Server cannot be started", e);
             System.exit(1);

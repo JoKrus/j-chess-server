@@ -8,4 +8,4 @@ RUN mvn clean compile assembly:single
 FROM openjdk:11-jdk-slim
 COPY --from=j-chess-builder /j-chess-server/target/j-chess-server-jar-with-dependencies.jar /app.jar
 CMD ["java", "-jar", "/app.jar"]
-EXPOSE 5123
+EXPOSE 5123 5124

@@ -17,12 +17,15 @@ public class Settings {
     public static final int LOGIN_TRIES_DEFAULT = 3;
     public static final String PORT = "PORT";
     public static final int PORT_DEFAULT = 5123;
+    public static final String SSL_PORT = "SSL_PORT";
+    public static final int SSL_PORT_DEFAULT = 5124;
     public static final String MAX_NAME_LENGTH = "MAX_NAME_LENGTH";
     public static final int MAX_NAME_LENGTH_DEFAULT = 30;
 
     static {
         initDefault(LOGIN_TRIES, LOGIN_TRIES_DEFAULT);
         initDefault(PORT, PORT_DEFAULT);
+        initDefault(SSL_PORT, SSL_PORT_DEFAULT);
         initDefault(MAX_NAME_LENGTH, MAX_NAME_LENGTH_DEFAULT);
     }
 
@@ -56,6 +59,7 @@ public class Settings {
         }
         loadIntPreferenceFromProperty(prop, LOGIN_TRIES);
         loadIntPreferenceFromProperty(prop, PORT);
+        loadIntPreferenceFromProperty(prop, SSL_PORT);
         loadIntPreferenceFromProperty(prop, MAX_NAME_LENGTH);
     }
 
