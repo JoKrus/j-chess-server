@@ -18,6 +18,7 @@ public class Logger {
     public LoggingLevel minimumLevel;
     private final ArrayList<LoggerBuilder.WriteObject> writeObjects;
     private final DateFormat format;
+    private final Object mutex = new Object();
 
     Logger(ArrayList<LoggerBuilder.WriteObject> writeObjects, LoggingLevel minimumLevel, DateFormat format) {
         this.writeObjects = writeObjects;
@@ -33,20 +34,22 @@ public class Logger {
                 this.format.format(Date.from(Instant.now())), StringUtils.center(loggingLevel.toString(),
                         LoggingLevel.MAX_NAME_LENGTH), msg);
         for (var wObj : this.writeObjects) {
-            try {
-                IOUtils.write(message, wObj.getMessageOutputStream(), StandardCharsets.UTF_8);
-            } catch (IOException e) {
-                //cant log error if error happens in logging
-                e.printStackTrace();
-            }
-
-            if (throwable != null) {
+            synchronized (this.mutex) {
                 try {
-                    IOUtils.write("Logged exception:" + System.lineSeparator(), wObj.getErrorOutputStream(), StandardCharsets.UTF_8);
-                    throwable.printStackTrace(new PrintStream(wObj.getErrorOutputStream()));
+                    IOUtils.write(message, wObj.getMessageOutputStream(), StandardCharsets.UTF_8);
                 } catch (IOException e) {
                     //cant log error if error happens in logging
                     e.printStackTrace();
+                }
+
+                if (throwable != null) {
+                    try {
+                        IOUtils.write("Logged exception:" + System.lineSeparator(), wObj.getErrorOutputStream(), StandardCharsets.UTF_8);
+                        throwable.printStackTrace(new PrintStream(wObj.getErrorOutputStream()));
+                    } catch (IOException e) {
+                        //cant log error if error happens in logging
+                        e.printStackTrace();
+                    }
                 }
             }
         }

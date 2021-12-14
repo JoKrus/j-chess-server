@@ -7,12 +7,12 @@ import net.jcom.jchess.server.networking.Player;
 import net.jcom.jchess.server.networking.PlayerStatus;
 import net.jcom.jchess.server.settings.Settings;
 
+import javax.net.ssl.SSLServerSocketFactory;
 import java.io.IOException;
 import java.net.*;
 import java.util.*;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import static net.jcom.jchess.server.StartServer.logger;
 import static net.jcom.jchess.server.networking.Defaults.DEFAULT_UUID;
@@ -22,6 +22,7 @@ public class Server {
 
     //Erstmal nur ohne ssl
     private ServerSocket serverSocket;
+    private ServerSocket sslServerSocket;
 
     //Erstmal ohne Spectators
     private final List<Player> connectedPlayers;
@@ -31,11 +32,12 @@ public class Server {
     private Server() {
         try {
             this.serverSocket = new ServerSocket(Settings.getInt(Settings.PORT));
+            this.sslServerSocket = SSLServerSocketFactory.getDefault().createServerSocket(5124);
         } catch (IOException e) {
             logger.fatal("Server cannot be started", e);
             System.exit(1);
         }
-        this.connectedPlayers = new ArrayList<>();
+        this.connectedPlayers = Collections.synchronizedList(new ArrayList<>());
 
         ScheduledThreadPoolExecutor heartBeatSender = new ScheduledThreadPoolExecutor(1);
         heartBeatSender.scheduleAtFixedRate(this::heartBeatSender, 1, 15, TimeUnit.SECONDS);
@@ -45,9 +47,13 @@ public class Server {
     }
 
     private void matchMaker() {
-        List<Player> queueingPlayers = this.connectedPlayers
-                .stream().filter((player) -> player.getStatus() == PlayerStatus.QUEUE)
-                .collect(Collectors.toList());
+        List<Player> queueingPlayers = new ArrayList<>();
+        this.connectedPlayers.forEach(player -> {
+            if (player.getStatus() == PlayerStatus.QUEUE) {
+                queueingPlayers.add(player);
+            }
+        });
+
         //TODO to ensure, player 3 also gets matched at some point, maybe take queue time into account
         Collections.shuffle(queueingPlayers);
         if (queueingPlayers.size() % 2 == 1) {
@@ -87,25 +93,32 @@ public class Server {
 
     public void waitForConnections() {
         this.printServerAddresses(this.serverSocket);
+        this.printServerAddresses(this.sslServerSocket);
 
+        Thread servAccept = new Thread(() -> acceptConnections(this.serverSocket));
+        Thread sslServAccept = new Thread(() -> acceptConnections(this.sslServerSocket));
+
+        servAccept.start();
+        sslServAccept.start();
+    }
+
+    private void acceptConnections(ServerSocket servSocket) {
         while (true) {
-            while (true) {
-                try {
+            try {
+                this.cleanUpPlayers();
+                logger.info("Waiting for a connection");
+                Socket clientSocket = servSocket.accept();
+                this.cleanUpPlayers();
+                if (clientSocket != null) {
+                    Communicator communicator = new Communicator(clientSocket);
+                    this.connectedPlayers.add(communicator.login());
                     this.cleanUpPlayers();
-                    logger.info("Waiting for a connection");
-                    Socket clientSocket = this.serverSocket.accept();
-                    this.cleanUpPlayers();
-                    if (clientSocket != null) {
-                        Communicator communicator = new Communicator(clientSocket);
-                        this.connectedPlayers.add(communicator.login());
-                        this.cleanUpPlayers();
-                        logger.info(this.connectedPlayers.size() + " clients connected");
-                    } else {
-                        logger.info("client socket is null");
-                    }
-                } catch (IOException var3) {
-                    logger.error(var3.getLocalizedMessage(), var3);
+                    logger.info(this.connectedPlayers.size() + " clients connected");
+                } else {
+                    logger.info("client socket is null");
                 }
+            } catch (IOException var3) {
+                logger.error(var3.getLocalizedMessage(), var3);
             }
         }
     }
@@ -121,7 +134,12 @@ public class Server {
     }
 
     public List<String> getConnectedPlayerNames() {
-        return this.connectedPlayers.stream().map(Player::getPlayerName).collect(Collectors.toList());
+        List<String> list = new ArrayList<>();
+        this.connectedPlayers.forEach(player -> {
+            String playerName = player.getPlayerName();
+            list.add(playerName);
+        });
+        return list;
     }
 
     private void printServerAddresses(ServerSocket serverSocket) {
