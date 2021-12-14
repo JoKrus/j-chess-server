@@ -93,13 +93,17 @@ public class Server {
 
     public void waitForConnections() {
         this.printServerAddresses(this.serverSocket);
-        this.printServerAddresses(this.sslServerSocket);
-
         Thread servAccept = new Thread(() -> acceptConnections(this.serverSocket));
-        Thread sslServAccept = new Thread(() -> acceptConnections(this.sslServerSocket));
-
         servAccept.start();
+
+        /*
+        //TODO SSL
+        NOT YET WORKING, so disabled for now
+
+        this.printServerAddresses(this.sslServerSocket);
+        Thread sslServAccept = new Thread(() -> acceptConnections(this.sslServerSocket));
         sslServAccept.start();
+        */
     }
 
     private void acceptConnections(ServerSocket servSocket) {
