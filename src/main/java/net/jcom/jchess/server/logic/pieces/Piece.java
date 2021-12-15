@@ -19,7 +19,7 @@ public abstract class Piece {
         this.pieceType = pieceType;
     }
 
-    protected abstract List<MoveData> possibleToMoveToUnchecked(Position position);
+    public abstract List<MoveData> possibleToMoveToUnchecked(Position position);
 
     public List<MoveData> possibleToMoveTo(Position position) {
         List<MoveData> uncheckedMoves = possibleToMoveToUnchecked(position);

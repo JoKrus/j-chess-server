@@ -14,7 +14,7 @@ public class Knight extends Piece {
     }
 
     @Override
-    protected List<MoveData> possibleToMoveToUnchecked(Position position) {
+    public List<MoveData> possibleToMoveToUnchecked(Position position) {
         List<MoveData> ret = new ArrayList<>();
 
         int x = this.getCoordinate().getX(), y = this.getCoordinate().getY();
