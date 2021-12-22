@@ -6,7 +6,7 @@
 
     <groupId>net.jcom.jchess.server</groupId>
     <artifactId>j-chess-server</artifactId>
-    <version>0.2.0</version>
+    <version>0.3.0</version>
 
     <name>JChessServer</name>
     <url>https://chess.j-com.net</url>
@@ -22,7 +22,20 @@
         <generated.classes.package>${project.groupId}.generated</generated.classes.package>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
+
     <dependencies>
+        <dependency>
+            <groupId>com.github.JoKrus</groupId>
+            <artifactId>j-chess-java-xsd</artifactId>
+            <version>master-SNAPSHOT</version>
+        </dependency>
+
         <!--
         Copyright (c) 2013, 2020 Oracle and/or its affiliates. All rights reserved.
 
@@ -189,64 +202,6 @@
                     <appendAssemblyId>true</appendAssemblyId>
                 </configuration>
             </plugin>
-
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>jaxb2-maven-plugin</artifactId>
-                <version>2.5.0</version>
-                <executions>
-                    <execution>
-                        <id>xjc</id>
-                        <goals>
-                            <goal>xjc</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <arguments>
-                        <argument>-XsimpleEquals</argument>
-                        <argument>-XsimpleHashCode</argument>
-                    </arguments>
-                    <sources>
-                        <source>${xsd.sources.dir}</source>
-                    </sources>
-                    <!-- The package of your generated sources -->
-                    <packageName>${generated.classes.package}</packageName>
-                </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.jvnet.jaxb2_commons</groupId>
-                        <artifactId>jaxb2-basics</artifactId>
-                        <version>0.12.0</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
-
-            <!--
-            <plugin>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-xjc-plugin</artifactId>
-                <version>3.3.0</version>
-                <executions>
-                    <execution>
-                        <id>xjc</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>xsdtojava</goal>
-                        </goals>
-                        <configuration>
-                            <sourceRoot>${generated.classes.dir}</sourceRoot>
-                            <xsdOptions>
-                                <xsdOption>
-                                    <xsd>${basedir}/${xsd.sources.dir}</xsd>
-                                    <packagename>${generated.classes.package}</packagename>
-                                </xsdOption>
-                            </xsdOptions>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            -->
         </plugins>
     </build>
 </project>
