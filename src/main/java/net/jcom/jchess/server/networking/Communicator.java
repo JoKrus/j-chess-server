@@ -1,6 +1,9 @@
 package net.jcom.jchess.server.networking;
 
 import net.jcom.jchess.server.Server;
+import net.jcom.jchess.server.exception.InvalidSchemaVersion;
+import net.jcom.jchess.server.factory.JChessMessageFactory;
+import net.jcom.jchess.server.generated.ErrorType;
 import net.jcom.jchess.server.generated.JChessMessage;
 import net.jcom.jchess.server.iostreams.JChessInputStream;
 import net.jcom.jchess.server.iostreams.JChessOutputStream;
@@ -19,6 +22,8 @@ public class Communicator {
     private static final ExecutorService loginQueueHandler = Executors.newFixedThreadPool(1);
     private JChessInputStream fromPlayer;
     private JChessOutputStream toPlayer;
+
+    private Player player;
 
     private final Object lock = new Object();
 
@@ -39,6 +44,11 @@ public class Communicator {
     public JChessMessage receiveMessage() {
         try {
             return this.fromPlayer.readJChess();
+        } catch (InvalidSchemaVersion e) {
+            logger.info("Client sent a message not compatible with the" +
+                    " current version of the server", e);
+            this.sendMessage(JChessMessageFactory.createDisconnectMessage(this.player.getId(), ErrorType.ERROR));
+            Server.getInstance().removePlayer(this);
         } catch (IOException var2) {
             logger.info("Connection was closed unexpected", var2);
             Server.getInstance().removePlayer(this);
@@ -85,6 +95,7 @@ public class Communicator {
         } catch (ExecutionException | InterruptedException var4) {
             logger.error(var4.getLocalizedMessage(), var4);
         }
+        this.player = player;
         return player;
     }
 

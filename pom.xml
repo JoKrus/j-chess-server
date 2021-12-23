@@ -31,7 +31,7 @@
 
   <dependencies>
     <dependency>
-      <groupId>com.github.JoKrus</groupId>
+      <groupId>com.github.jokrus</groupId>
       <artifactId>j-chess-java-xsd</artifactId>
       <version>master-SNAPSHOT</version>
     </dependency>
