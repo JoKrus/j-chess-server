@@ -47,7 +47,10 @@ public class Communicator {
         } catch (InvalidSchemaVersion e) {
             logger.info("Client sent a message not compatible with the" +
                     " current version of the server", e);
-            this.sendMessage(JChessMessageFactory.createDisconnectMessage(this.player.getId(), ErrorType.ERROR));
+            this.sendMessage(JChessMessageFactory.createDisconnectMessage(this.player != null ?
+                            this.player.getId() :
+                            Defaults.DEFAULT_PLAYER.getId(),
+                    ErrorType.VERSION_MISMATCH));
             Server.getInstance().removePlayer(this);
         } catch (IOException var2) {
             logger.info("Connection was closed unexpected", var2);
