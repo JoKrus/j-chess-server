@@ -33,7 +33,7 @@
     <dependency>
       <groupId>com.github.jokrus</groupId>
       <artifactId>j-chess-java-xsd</artifactId>
-      <version>master-SNAPSHOT</version>
+      <version>v0.1.3</version>
     </dependency>
 
     <!--
