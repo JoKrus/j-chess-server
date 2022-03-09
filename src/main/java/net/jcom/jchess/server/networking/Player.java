@@ -8,6 +8,7 @@ public class Player {
     private final Communicator communicator;
     private final String playerName;
     private PlayerStatus status;
+    private String tournamentCode;
     //TODO role (Player / Spectator)
 
     public Player(UUID id, Communicator communicator, String playerName) {
@@ -15,6 +16,14 @@ public class Player {
         this.communicator = communicator;
         this.playerName = playerName;
         this.status = PlayerStatus.QUEUE;
+    }
+
+    public Player(UUID id, Communicator communicator, String playerName, String tournamentCode) {
+        this.id = id;
+        this.communicator = communicator;
+        this.playerName = playerName;
+        this.status = PlayerStatus.TOURNAMENT_MATCHMAKING;
+        this.tournamentCode = tournamentCode;
     }
 
     public UUID getId() {
@@ -31,6 +40,10 @@ public class Player {
 
     public PlayerStatus getStatus() {
         return this.status;
+    }
+
+    public String getTournamentCode() {
+        return this.tournamentCode;
     }
 
     public void setStatus(PlayerStatus status) {

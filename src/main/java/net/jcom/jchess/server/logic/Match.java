@@ -1,6 +1,8 @@
 package net.jcom.jchess.server.logic;
 
+import net.jcom.jchess.server.data.MatchStatusDataExtended;
 import net.jcom.jchess.server.factory.JChessMessageFactory;
+import net.jcom.jchess.server.fileio.SuperFileHandler24;
 import net.jcom.jchess.server.generated.*;
 import net.jcom.jchess.server.networking.Player;
 import net.jcom.jchess.server.networking.PlayerStatus;
@@ -15,6 +17,12 @@ public class Match {
     private final Random randomStart;
     private final MatchFormatData matchFormatData;
     private final MatchStatusData matchStatusData;
+    private String tournamentCode;
+
+    public Match(List<Player> playerList, UUID matchId, String tournamentCode) {
+        this(playerList, matchId);
+        this.tournamentCode = tournamentCode;
+    }
 
     public Match(List<Player> playerList, UUID matchId) {
         this.matchFormatData = MatchDefaults.MATCH_FORMAT_DATA;
@@ -136,7 +144,12 @@ public class Match {
             player.getCommunicator().sendMessage(msg);
         }
         logger.info("Match " + this.matchId + ": is over.");
-        //TODO maybe save game to sqlite or something
+
+        if (this.tournamentCode != null) {
+            SuperFileHandler24.getInstance().registerMatchResult(new MatchStatusDataExtended(this.matchStatusData,
+                    this.tournamentCode), status -> {
+            });
+        }
     }
 
     public boolean equals(Object o) {

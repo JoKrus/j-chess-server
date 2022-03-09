@@ -45,7 +45,12 @@ public class PlayerLoginCallable implements Callable<Player> {
                     failedLoginCounter++;
                     continue;
                 }
-                player = new Player(id, this.communicator, name);
+
+                if (loginMessage.getTournamentCode() != null && !loginMessage.getTournamentCode().isEmpty()) {
+                    player = new Player(id, this.communicator, name, loginMessage.getTournamentCode());
+                } else {
+                    player = new Player(id, this.communicator, name);
+                }
             }
 
             if (player != null && !DEFAULT_UUID.equals(player.getId())) {

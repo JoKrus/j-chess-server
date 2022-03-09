@@ -1,5 +1,6 @@
 package net.jcom.jchess.server;
 
+import net.jcom.jchess.server.fileio.SuperFileHandler24;
 import net.jcom.jchess.server.logging.Logger;
 import net.jcom.jchess.server.logging.LoggerBuilder;
 import net.jcom.jchess.server.settings.Settings;
@@ -13,6 +14,7 @@ public class StartServer {
             .addWriteStream(System.out, System.err).minimumLevel(Logger.LoggingLevel.DEBUG).build();
 
     public static void main(String[] args) {
+        setStorageFolder();
         parseArgs(args);
         // Wenn mit null aufgerufen, werden Standardwerte benutzt
         Settings.load(configPath);
@@ -47,5 +49,12 @@ public class StartServer {
         HelpFormatter formatter = new HelpFormatter();
         formatter.printHelp("java -jar jComServer.jar [options]\nAvailable Options:", options);
         System.exit(exitCode);
+    }
+
+    public static void setStorageFolder() {
+        if (SuperFileHandler24.STORAGE_FOLDER.equals(SuperFileHandler24.NOT_SET)) {
+            SuperFileHandler24.STORAGE_FOLDER = System.getenv("J_CHESS_RESULT_STORAGE");
+            logger.info("Storage folder set to " + SuperFileHandler24.STORAGE_FOLDER);
+        }
     }
 }

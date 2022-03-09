@@ -13,6 +13,7 @@ import java.net.*;
 import java.util.*;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static net.jcom.jchess.server.StartServer.logger;
 import static net.jcom.jchess.server.networking.Defaults.DEFAULT_UUID;
@@ -44,6 +45,34 @@ public class Server {
 
         ScheduledThreadPoolExecutor matchMaker = new ScheduledThreadPoolExecutor(1);
         matchMaker.scheduleAtFixedRate(this::matchMaker, 0, 25, TimeUnit.SECONDS);
+
+        ScheduledThreadPoolExecutor tournamentMatchMaker = new ScheduledThreadPoolExecutor(1);
+        tournamentMatchMaker.scheduleAtFixedRate(this::tournamentMatchMaker, 2, 50, TimeUnit.SECONDS);
+    }
+
+    private void tournamentMatchMaker() {
+        HashMap<String, ArrayList<Player>> queueingPlayers = new HashMap<>();
+        this.connectedPlayers.forEach(player -> {
+            if (player.getStatus() == PlayerStatus.TOURNAMENT_MATCHMAKING) {
+                var list = queueingPlayers.getOrDefault(player.getTournamentCode(), new ArrayList<Player>());
+                list.add(player);
+                queueingPlayers.put(player.getTournamentCode(), list);
+            }
+        });
+
+        List<Map.Entry<String, ArrayList<Player>>> collect = queueingPlayers.entrySet().stream().filter(stringArrayListEntry -> stringArrayListEntry.getValue().size() == 2).collect(Collectors.toList());
+
+        for (var matchIngredients : collect) {
+            UUID matchId = UUID.randomUUID();
+            Thread t = new Thread(() -> {
+                Match match = new Match(matchIngredients.getValue(), matchId, matchIngredients.getKey());
+                match.startMatch();
+            });
+            t.setName(matchIngredients.getKey() + " " + matchId);
+            t.start();
+            //  this.runningGamePoolExecutor.submit();
+        }
+
     }
 
     private void matchMaker() {
