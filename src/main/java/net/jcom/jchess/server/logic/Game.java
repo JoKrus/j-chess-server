@@ -72,11 +72,13 @@ public class Game {
 
             switch (message.getMessageType()) {
                 case MOVE:
-                    var moveComand = message.getMove().getMove();
-                    //To ignore the case for the promotion unit
-                    moveComand.setPromotionUnit(moveComand.getPromotionUnit().toLowerCase(Locale.ROOT));
+                    var moveCommand = message.getMove().getMove();
+                    if (moveCommand.getPromotionUnit() != null) {
+                        //To ignore the case for the promotion unit
+                        moveCommand.setPromotionUnit(moveCommand.getPromotionUnit().toLowerCase(Locale.ROOT));
+                    }
                     try {
-                        if (this.position.checkIfLegalMove(moveComand)) {
+                        if (this.position.checkIfLegalMove(moveCommand)) {
                             this.position.playMove(message.getMove().getMove());
                             this.lastMove = message.getMove().getMove();
                             this.timeLeft.put(currentPlayerColor, this.timeLeft.get(currentPlayerColor) - (endMaybe - start));
