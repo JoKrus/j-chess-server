@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 public class Game {
     private final List<Player> playerList;
@@ -71,8 +72,11 @@ public class Game {
 
             switch (message.getMessageType()) {
                 case MOVE:
+                    var moveComand = message.getMove().getMove();
+                    //To ignore the case for the promotion unit
+                    moveComand.setPromotionUnit(moveComand.getPromotionUnit().toLowerCase(Locale.ROOT));
                     try {
-                        if (this.position.checkIfLegalMove(message.getMove().getMove())) {
+                        if (this.position.checkIfLegalMove(moveComand)) {
                             this.position.playMove(message.getMove().getMove());
                             this.lastMove = message.getMove().getMove();
                             this.timeLeft.put(currentPlayerColor, this.timeLeft.get(currentPlayerColor) - (endMaybe - start));
